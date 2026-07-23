@@ -110,6 +110,8 @@ alFin:
     mov rdi, debugLine
     call Print
 
+    call InitBoard
+
     mov rdi, 4
     mov rsi, 5
     call GetTile
@@ -119,7 +121,7 @@ alFin:
 
     jmp exit
 
-GetTile:
+InitBoard:
     ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
     ; (yPos) Row - RSI
     ; RETURN: actual position (i.e. RDI=3 -> RAX=8) - RAX
@@ -181,19 +183,16 @@ GetTile:
     jmp .IncrementLoop
 
 .FinishLoop:
+    ret
 
-    ; r9 holds total chars
-    mov rax, r9 
-        
-    xor rdx,rdx ; need to clear
-        
-    mov rcx, r12 ; r12 holds number of chars per line (incl. \n)
-    
-    div rcx ; we want to get number of rows, by dividing r12 by r9
-
-    ;mov al, [rbp-3] 
-    add al, '0'
-    mov [rbp-5], al
+GetTile:
+    mov [rbp-64], rdi ; store arg1 in memory (index)
+    mov [rbp-56], rsi;
+    mov r8, arrBoard
+    mov r9, 0 ; counter variable
+    mov r10, 0 ; how many 0xA found
+    xor r12, r12 ; holds amount of characters per line
+    mov r13, 0 ; number of tiles per row
 
 .ConvertArgToRawIndex:
 
