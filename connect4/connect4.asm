@@ -16,7 +16,7 @@ section .data
     ttt db 'TRUE',10,0
     fff db 'FALSE',10,0
 
-    arrBoard times 9 db '[0][1][2][3][4][5][6]', 10
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10;'[0][1][2][3][4][5][6]', 10
     len_arrBoard equ $-arrBoard 
 
 
@@ -119,8 +119,19 @@ alFin:
     ;mov rdi, rax
     ;call Print
     
-    mov rsi, rax 
-    mov rdx, 1
+    ;mov rsi, arrBoard
+    ;mov rdx, len_arrBoard
+    ;mov rax, 1       
+    ;mov rdi, 1       
+    ;syscall
+
+    mov rdi, 4
+    mov rsi, 2
+    mov rdx, 'O'
+    call SetTile
+
+    mov rsi, arrBoard
+    mov rdx, len_arrBoard
     mov rax, 1       
     mov rdi, 1       
     syscall
@@ -185,6 +196,23 @@ InitBoard:
 
 
 
+SetTile: 
+    ; xPos - RDI
+    ; yPos - RSI
+    ; char - RDX
+    ; RETURN: pointer to correct tile
+    ;
+    ; USAGE EXAMPLE
+    ; mov rdi, 4
+    ; mov rsi, 2
+    ; mov rdx, 'O'
+    ; call SetTile
+
+    mov [rbp-40], rdx ; store RDX in stack
+    call GetTile ; get the tile (this overwrites rdi/rsi/rdx/etc)
+    mov r15b, [rbp-40] ; get the 8 bytes from rbp
+    mov [rax], r15b ; write the character to the tile position
+    ret
 
 GetTile:
     ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
@@ -226,7 +254,7 @@ mov r14, 1 ; raw index in array
 
 
     add rcx, r14
-    mov [rcx], 'X'
+    ;mov [rcx], 'X'
     mov rax, rcx ; RETURN POINTER TO THE CORRECT TILE
     ret
 
