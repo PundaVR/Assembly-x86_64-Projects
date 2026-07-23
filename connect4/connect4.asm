@@ -142,24 +142,22 @@ GetTile:
     mov r11, arrBoard
     mov r9, 0 ; counter variable
     ;mov al, byte [rdi] ; al contains byte we're looking at
-    mov r8, len_arrBoard 
+    ;mov r8, len_arrBoard 
 .StartLoop:
-    mov rdi, fff
-    call Print 
+    
 
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
     je .FinishLoop ; IF counter > arrBoardLength
 
-    ;cmp byte [r11], 0xA 
-    ;je .debugA
-    
-    
+
+    cmp r11, 10 ;WHYNOOWOROOOKKKK 
+    je .debugA
+    jmp .debugB ;jne
+
 
 
     
 .IncrementLoop:
-    mov rdi, ttt
-    call Print 
     inc r9 ; increment counter
     inc r11 ; increment al
 
@@ -167,6 +165,10 @@ GetTile:
 
 .debugA:
     mov rdi, ttt
+    call Print
+    jmp .IncrementLoop
+.debugB:
+    mov rdi, fff
     call Print
     jmp .IncrementLoop
 
