@@ -1,6 +1,6 @@
 DEFAULT REL
 
-;section .bss
+section .bss
 
 section .data
     msgStart db 'Connect 4 in Assembly', 10, 0
@@ -11,7 +11,12 @@ section .data
 
     arrNum db 1,3,5,8,3,4,6,7
 
-    arrRow times 3 db '[ ][ ][ ]', 10 
+    
+    ttt db 'TRUE',10,0
+    fff db 'FALSE',10,0
+
+    arrBoard times 3 db '[X][Y][Z]', 10 
+
 
     sum db 0
 
@@ -28,44 +33,58 @@ _start:
     mov rsi, msgStart ; buf: 64-bit memory address (MUST use rsi)
     mov rdx, lenStart ; count: length of string
     syscall
+;
+;
+; BULLSHIT TESTING BELOW!!!
+;
+;
 
+    mov  eax, 3         ; Number of bytes to sum 
+    mov  ebx, 0         ; Accumulator for sum
+    mov  ecx, arrBoard  ; Pointer to current byte
+    
+    inc ecx ; START FROM 2nd CHARACTER
+    mov [ecx], 'A'
+
+    add ecx, 3
+    mov [ecx], 'B'
+
+    add ecx, 3
+    mov [ecx], 'C'
+
+    sub ecx, 6
+
+    cmp byte [ecx], 'A'
+    jne isFalse
+
+    mov rdi, ttt
+    jmp fin
+isFalse:
+    mov rdi, fff
+    jmp fin
+fin:
+    call Print
+
+
+    ; PRINT BOARD
+    mov rdi, arrBoard
+    call Print
 
     ; ADD LOOP
 
-    mov r8, arrNum
 
     mov  eax,4      ;number bytes to be summed 
     mov  ebx,0      ;EBX will store the sum
     mov  ecx, arrNum     ;ECX will point to the current element to be summed
 
-top:  add  ebx, [ecx]
-    add  ecx,1      ;move pointer to next element
-    dec  eax        ;decrement counter
-    
-
-    jnz  top        ;if counter not 0, then loop again
-
-    add ebx, '0'
-    mov [sum], ebx
-
-    mov rdi, sum
-    call Print
 
 
 
-
-
-
-
-
-    mov rdi, arrNum
-    call Print
-
-
-
-
-    mov rdi, msgStart
-    call Print
+    ;mov rdi, arrNum
+    ;call Print
+;
+    ;mov rdi, msgStart
+    ;call Print
     
     jmp exit
 
