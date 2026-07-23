@@ -116,8 +116,14 @@ alFin:
     mov rsi, 2
     call GetTile
 
-    mov rdi, rax
+    ;mov rdi, rax
     ;call Print
+    
+    mov rsi, rax 
+    mov rdx, 1
+    mov rax, 1       
+    mov rdi, 1       
+    syscall
 
     jmp exit
 
@@ -222,16 +228,6 @@ mov r14, 1 ; raw index in array
     add rcx, r14
     mov [rcx], 'X'
     mov rax, rcx ; RETURN POINTER TO THE CORRECT TILE
-
-;;;;logic
-
-
-    
-
-.GetTileEnd:
-
-    mov rdi, arrBoard
-    call Print
     ret
 
 
