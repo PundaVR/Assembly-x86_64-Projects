@@ -86,7 +86,49 @@ fin:
     ;mov rdi, msgStart
     ;call Print
     
+    mov rdi, 1
+    mov rsi, 'A'
+    call CompareTile
+
+    cmp rax, '0'
+    je alFalse
+
+    mov rdi, ttt
+    jmp alFin
+alFalse:
+    mov rdi, fff
+    jmp alFin
+alFin:
+    call Print
+
+
+
     jmp exit
+
+
+CompareTile:
+    ; index - RDI (dil) holds the index of the tile (in future should be 1-9, not increments of 3)
+    ; value - RSI (sil) holds what we are comparing for (i.e. 'A')
+    ; return -> RAX (al) is return value ('1' or '0')
+
+    ; EXAMPLE USAGE:
+    ; mov rdi, 1
+    ; mov rsi, 'A'
+    ; call CompareTile
+
+    mov rcx, arrBoard ; holds arrBoard - ECX (cl)
+    add rcx, rdi      ; add index to board pointer - RDI (dil) 
+    
+    cmp byte [rcx], sil      ; compare byte at board pointer to RSI (sil)
+    jne .compareFalse
+
+    mov rax, '1' ; RAX = TRUE
+    jmp .compared
+.compareFalse:
+    mov rax, '0' ; RAX = FALSE
+    jmp .compared
+.compared:
+    ret
 
 
 Print:
