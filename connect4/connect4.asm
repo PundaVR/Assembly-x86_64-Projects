@@ -16,7 +16,7 @@ section .data
     ttt db 'TRUE',10,0
     fff db 'FALSE',10,0
 
-    arrBoard times 3 db '[1][2][3][4][5][6]', 10
+    arrBoard times 9 db '[0][1][2][3][4][5][6]', 10
     len_arrBoard equ $-arrBoard 
 
 
@@ -196,18 +196,23 @@ GetTile:
 ; to get amount of tiles per row: ([r12]-1) / 3 
 
 mov r13, 0 ; amount of tiles per row
-mov rdi, 4;[rbp-2] ; xPos
-mov rsi, 0;[rbp-3] ; yPos
+mov rdi, 5 ;[rbp-2] ; xPos
+mov rsi, 4 ;[rbp-3] ; yPos
 mov r14, 1 ; raw index in array
 ; x has to be within range + 3
 ; +
 ; multiply yPos by [rbp-4]
 
-    mul rdi, 3
-    mul rsi, [rbp-4]
-    add r14, rdi
-    add r14, rsi
-    
+    mul rdi, 3       ; xPos * 3
+    mul rsi, [rbp-4] ; yPos * number of characters per row
+    add r14, rdi     ; add xPos to index
+    add r14, rsi     ; add yPos to index
+    cmp rsi, 0       ; check if yPos is 0
+    je .AssignRawIndex
+    ;ELSE:
+    add r14, 4 ; because anything not on first row is off by 1 char
+
+.AssignRawIndex:
     mov  rcx, arrBoard  ; Pointer to current byte
     ;inc rcx ; START FROM 2nd CHARACTER
 
