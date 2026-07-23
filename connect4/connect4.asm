@@ -112,8 +112,8 @@ alFin:
 
     call InitBoard
 
-    mov rdi, 4
-    mov rsi, 5
+    mov rdi, 3
+    mov rsi, 2
     call GetTile
 
     mov rdi, rax
@@ -122,11 +122,6 @@ alFin:
     jmp exit
 
 InitBoard:
-    ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
-    ; (yPos) Row - RSI
-    ; RETURN: actual position (i.e. RDI=3 -> RAX=8) - RAX
-
-
     ; We know there are 10 characters per line
     ; '[X][Y][Z]', 0xA
     ; The values are:
@@ -139,21 +134,16 @@ InitBoard:
     ; 
     ; We have 3 rows, so if > 10 we can divide by 10 and use remainder
     ; We can search for amount of 0xA to determine number of rows 
-    ; 
-    ;
-    ;
-    ;
+   
 
     ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
     
     ; push rdi ; PUSH RDI (if we add more code in future)
-    mov [rbp-64], rdi ; store arg1 in memory (index)
-    mov [rbp-56], rsi;
+   
     mov r8, arrBoard
     mov r9, 0 ; counter variable
     mov r10, 0 ; how many 0xA found
     xor r12, r12 ; holds amount of characters per line
-    mov r13, 0 ; number of tiles per row
 .StartLoop:
     ; CHECK IF REACHED END OF BOARD
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
@@ -185,7 +175,15 @@ InitBoard:
 .FinishLoop:
     ret
 
+
+
+
+
+
 GetTile:
+    ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
+    ; (yPos) Row - RSI
+    ; RETURN: pointer to correct tile (char in string)
     mov [rbp-64], rdi ; store arg1 in memory (index)
     mov [rbp-56], rsi;
     mov r8, arrBoard
@@ -223,14 +221,12 @@ mov r14, 1 ; raw index in array
 
     add rcx, r14
     mov [rcx], 'X'
+    mov rax, rcx ; RETURN POINTER TO THE CORRECT TILE
 
 ;;;;logic
 
 
-mov [rbp-6], r13 ; store globally tiles per row
-
-
-
+    
 
 .GetTileEnd:
 
