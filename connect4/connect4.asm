@@ -110,6 +110,8 @@ alFin:
     mov rdi, debugLine
     call Print
 
+    mov rdi, 0
+    mov rsi, 8
     call GetTile
 
     jmp exit
@@ -140,8 +142,8 @@ GetTile:
     ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
     
     ; push rdi ; PUSH RDI (if we add more code in future)
-    mov [rbp-2], rdi ; store arg1 in memory (index)
-    mov [rbp-3], rsi;
+    mov [rbp-64], rdi ; store arg1 in memory (index)
+    mov [rbp-56], rsi;
     mov r8, arrBoard
     mov r9, 0 ; counter variable
     mov r10, 0 ; how many 0xA found
@@ -196,8 +198,8 @@ GetTile:
 ; to get amount of tiles per row: ([r12]-1) / 3 
 
 mov r13, 0 ; amount of tiles per row
-mov rdi, 5 ;[rbp-2] ; xPos
-mov rsi, 4 ;[rbp-3] ; yPos
+mov rdi, [rbp-64] ; xPos
+mov rsi, [rbp-56] ; yPos
 mov r14, 1 ; raw index in array
 ; x has to be within range + 3
 ; +
@@ -210,7 +212,7 @@ mov r14, 1 ; raw index in array
     cmp rsi, 0       ; check if yPos is 0
     je .AssignRawIndex
     ;ELSE:
-    add r14, 4 ; because anything not on first row is off by 1 char
+    add r14, [rbp-56] ; because anything not on first row is off by 1 char
 
 .AssignRawIndex:
     mov  rcx, arrBoard  ; Pointer to current byte
