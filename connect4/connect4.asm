@@ -16,7 +16,7 @@ section .data
     ttt db 'TRUE',10,0
     fff db 'FALSE',10,0
 
-    arrBoard times 3 db '[X][Y][Z]', 10
+    arrBoard times 3 db '[1][2][3][4][5][6]', 10
     len_arrBoard equ $-arrBoard 
 
 
@@ -115,7 +115,8 @@ alFin:
     jmp exit
 
 GetTile:
-    ; Index of tile, will be 0,1,2,3,etc - RDI 
+    ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
+    ; (yPos) Row - RSI
     ; RETURN: actual position (i.e. RDI=3 -> RAX=8) - RAX
 
 
@@ -139,13 +140,13 @@ GetTile:
     ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
     
     ; push rdi ; PUSH RDI (if we add more code in future)
-    mov [rbp-3], rdi ; store arg1 in memory (index)
-
+    mov [rbp-2], rdi ; store arg1 in memory (index)
+    mov [rbp-3], rsi;
     mov r8, arrBoard
     mov r9, 0 ; counter variable
     mov r10, 0 ; how many 0xA found
     xor r12, r12 ; holds amount of characters per line
-    
+    mov r13, 0 ; number of tiles per row
 .StartLoop:
     ; CHECK IF REACHED END OF BOARD
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
@@ -153,7 +154,7 @@ GetTile:
     
     ; LOOK FOR NEWLINE CHARACTER
     cmp byte [r8], 10
-    je .foundNewLine
+    je .FoundNewLine
 
 .IncrementLoop:
     inc r9 ; increment counter
@@ -161,7 +162,7 @@ GetTile:
 
     jmp .StartLoop
 
-.foundNewLine:
+.FoundNewLine:
     mov rdi, ttt
     call Print
 
@@ -171,6 +172,7 @@ GetTile:
 
     ;ELSE:
     mov r12, r9 ; r12 now holds amount of chars per line 
+    mov [rbp-4], r9 ; store in memory
     jmp .IncrementLoop
 
 .FinishLoop:
@@ -186,17 +188,45 @@ GetTile:
 
     ;mov al, [rbp-3] 
     add al, '0'
-    mov [rbp-3], al
+    mov [rbp-5], al
 
-    ; then we want to print it
-    mov rax, 1       
-    mov edi, 1       
-    lea rsi, [rbp-3]
-    mov rdx, 8
-    syscall
+.ConvertArgToRawIndex:
+
+; need to convert RDI into a raw index
+; to get amount of tiles per row: ([r12]-1) / 3 
+
+mov r13, 0 ; amount of tiles per row
+mov rdi, 4;[rbp-2] ; xPos
+mov rsi, 0;[rbp-3] ; yPos
+mov r14, 1 ; raw index in array
+; x has to be within range + 3
+; +
+; multiply yPos by [rbp-4]
+
+    mul rdi, 3
+    mul rsi, [rbp-4]
+    add r14, rdi
+    add r14, rsi
+    
+    mov  rcx, arrBoard  ; Pointer to current byte
+    ;inc rcx ; START FROM 2nd CHARACTER
+
+
+    add rcx, r14
+    mov [rcx], 'X'
+
+;;;;logic
+
+
+mov [rbp-6], r13 ; store globally tiles per row
 
 
 
+
+.GetTileEnd:
+
+    mov rdi, arrBoard
+    call Print
     ret
 
 
