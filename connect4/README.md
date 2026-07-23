@@ -5,8 +5,8 @@
 - jnz <label> - always checks for EAX == 0
 
 ## STACK ALLOCATIONS
- - rbp-1 = CompareTile return
-
+- rbp-1 = CompareTile return
+- rbp-2 = GetTile arrBoard byte pointer  
 
 ## Functions:
 > ARGS: RDI, RSI, RDX

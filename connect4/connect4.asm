@@ -28,7 +28,7 @@ section .text
 _start:
     push rbp ; save the old base pointer (extern program called)
     mov rbp, rsp ; RBP takes the current snapshot of RSP
-    sub rsp, 256 ; using rsp instead of rbp because that worked earlier
+    sub rsp, 64 ; using rsp instead of rbp because that worked earlier
 
     mov rax, 1        ; sys_write
     mov edi, 1        ; fd: stdout (clears upper 32 bits of rdi, saving 1 byte)
@@ -139,7 +139,7 @@ GetTile:
     ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
     
     ; push rdi ; PUSH RDI (r11) (if we add more code in future)
-    mov r11, arrBoard
+    mov r8, arrBoard
     mov r9, 0 ; counter variable
     ;mov al, byte [rdi] ; al contains byte we're looking at
     ;mov r8, len_arrBoard 
@@ -149,8 +149,14 @@ GetTile:
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
     je .FinishLoop ; IF counter > arrBoardLength
 
-
-    cmp r11, 10 ;WHYNOOWOROOOKKKK 
+    
+    ; LOOK FOR NEWLINE CHARACTER
+    mov rdi, r9
+    mov rsi, 0xA
+    call CompareTile
+    ;cmp [rbp-1], 1
+    cmp byte [r8], 10 ;WHYNOOWOROOOKKKK 
+        
     je .debugA
     jmp .debugB ;jne
 
@@ -159,7 +165,7 @@ GetTile:
     
 .IncrementLoop:
     inc r9 ; increment counter
-    inc r11 ; increment al
+    inc r8 ; increment al
 
     jmp .StartLoop
 
