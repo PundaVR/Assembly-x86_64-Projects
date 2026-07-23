@@ -138,47 +138,64 @@ GetTile:
 
     ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
     
-    ; push rdi ; PUSH RDI (r11) (if we add more code in future)
+    ; push rdi ; PUSH RDI (if we add more code in future)
+    mov [rbp-3], rdi ; store arg1 in memory (index)
+
     mov r8, arrBoard
     mov r9, 0 ; counter variable
-    ;mov al, byte [rdi] ; al contains byte we're looking at
-    ;mov r8, len_arrBoard 
-.StartLoop:
+    mov r10, 0 ; how many 0xA found
+    xor r12, r12 ; holds amount of characters per line
     
-
+.StartLoop:
+    ; CHECK IF REACHED END OF BOARD
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
     je .FinishLoop ; IF counter > arrBoardLength
-
     
     ; LOOK FOR NEWLINE CHARACTER
-    mov rdi, r9
-    mov rsi, 0xA
-    call CompareTile
-    ;cmp [rbp-1], 1
-    cmp byte [r8], 10 ;WHYNOOWOROOOKKKK 
-        
-    je .debugA
-    jmp .debugB ;jne
+    cmp byte [r8], 10
+    je .foundNewLine
 
-
-
-    
 .IncrementLoop:
     inc r9 ; increment counter
     inc r8 ; increment al
 
     jmp .StartLoop
 
-.debugA:
+.foundNewLine:
     mov rdi, ttt
     call Print
-    jmp .IncrementLoop
-.debugB:
-    mov rdi, fff
-    call Print
+
+    inc r10 ; inc amount of 0xA found
+    cmp r10, 1
+    jne .IncrementLoop ; if NOT first 0xA, continue
+
+    ;ELSE:
+    mov r12, r9 ; r12 now holds amount of chars per line 
     jmp .IncrementLoop
 
 .FinishLoop:
+
+    ; r9 holds total chars
+    mov rax, r9 
+        
+    xor rdx,rdx ; need to clear
+        
+    mov rcx, r12 ; r12 holds number of chars per line (incl. \n)
+    
+    div rcx ; we want to get number of rows, by dividing r12 by r9
+
+    ;mov al, [rbp-3] 
+    add al, '0'
+    mov [rbp-3], al
+
+    ; then we want to print it
+    mov rax, 1       
+    mov edi, 1       
+    lea rsi, [rbp-3]
+    mov rdx, 8
+    syscall
+
+
 
     ret
 
