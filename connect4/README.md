@@ -4,6 +4,13 @@
 
 - jnz <label> - always checks for EAX == 0
 
-Functions:
+## STACK ALLOCATIONS
+ - rbp-1 = CompareTile return
+
+
+## Functions:
+> ARGS: RDI, RSI, RDX
+> RETURN: RAX
+
 - Print (RDI string)
 - 

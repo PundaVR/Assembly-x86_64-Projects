@@ -11,11 +11,13 @@ section .data
 
     arrNum db 1,3,5,8,3,4,6,7
 
+    debugLine db '=====================================',10,0
     
     ttt db 'TRUE',10,0
     fff db 'FALSE',10,0
 
-    arrBoard times 3 db '[X][Y][Z]', 10 
+    arrBoard times 3 db '[X][Y][Z]', 10
+    len_arrBoard equ $-arrBoard 
 
 
     sum db 0
@@ -90,7 +92,7 @@ fin:
     mov rsi, 'A'
     call CompareTile
 
-    cmp rax, '0'
+    cmp [rbp-1], 0
     je alFalse
 
     mov rdi, ttt
@@ -101,20 +103,90 @@ alFalse:
 alFin:
     call Print
 
+; 0, 1, 2
+; 2, 5, 8
+;
 
+    mov rdi, debugLine
+    call Print
+
+    call GetTile
 
     jmp exit
+
+GetTile:
+    ; Index of tile, will be 0,1,2,3,etc - RDI 
+    ; RETURN: actual position (i.e. RDI=3 -> RAX=8) - RAX
+
+
+    ; We know there are 10 characters per line
+    ; '[X][Y][Z]', 0xA
+    ; The values are:
+    ; > 2, 5, 8 (increments of 3)
+    ; = X, Y, Z
+    ;
+    ; Goal is
+    ; > 0, 1, 2
+    ; = X, Y, Z
+    ; 
+    ; We have 3 rows, so if > 10 we can divide by 10 and use remainder
+    ; We can search for amount of 0xA to determine number of rows 
+    ; 
+    ;
+    ;
+    ;
+
+    ;;; FIND AMOUNT OF 0xA TO DETERMINE NUMBER OF ROWS
+    
+    ; push rdi ; PUSH RDI (r11) (if we add more code in future)
+    mov r11, arrBoard
+    mov r9, 0 ; counter variable
+    ;mov al, byte [rdi] ; al contains byte we're looking at
+    mov r8, len_arrBoard 
+.StartLoop:
+    mov rdi, fff
+    call Print 
+
+    cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
+    je .FinishLoop ; IF counter > arrBoardLength
+
+    ;cmp byte [r11], 0xA 
+    ;je .debugA
+    
+    
+
+
+    
+.IncrementLoop:
+    mov rdi, ttt
+    call Print 
+    inc r9 ; increment counter
+    inc r11 ; increment al
+
+    jmp .StartLoop
+
+.debugA:
+    mov rdi, ttt
+    call Print
+    jmp .IncrementLoop
+
+.FinishLoop:
+
+    ret
 
 
 CompareTile:
     ; index - RDI (dil) holds the index of the tile (in future should be 1-9, not increments of 3)
     ; value - RSI (sil) holds what we are comparing for (i.e. 'A')
-    ; return -> RAX (al) is return value ('1' or '0')
+    
+    ; [rbp-1] HOLDS BIT TO COMPARE
 
     ; EXAMPLE USAGE:
     ; mov rdi, 1
     ; mov rsi, 'A'
     ; call CompareTile
+    ; cmp [rbp-1], 0
+    ; je LABEL_TO_JUMP
 
     mov rcx, arrBoard ; holds arrBoard - ECX (cl)
     add rcx, rdi      ; add index to board pointer - RDI (dil) 
@@ -122,14 +194,19 @@ CompareTile:
     cmp byte [rcx], sil      ; compare byte at board pointer to RSI (sil)
     jne .compareFalse
 
-    mov rax, '1' ; RAX = TRUE
+    mov [rbp-1], 1 ; RAX = TRUE
     jmp .compared
 .compareFalse:
-    mov rax, '0' ; RAX = FALSE
+    mov [rbp-1], 0 ; RAX = FALSE
     jmp .compared
 .compared:
     ret
 
+
+
+PrintString:
+    ; RDI - contains 
+    ret
 
 Print:
     ; RDI is the message we're sending
