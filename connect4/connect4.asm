@@ -110,9 +110,12 @@ alFin:
     mov rdi, debugLine
     call Print
 
-    mov rdi, 0
-    mov rsi, 8
+    mov rdi, 4
+    mov rsi, 5
     call GetTile
+
+    mov rdi, rax
+    ;call Print
 
     jmp exit
 
@@ -174,7 +177,7 @@ GetTile:
 
     ;ELSE:
     mov r12, r9 ; r12 now holds amount of chars per line 
-    mov [rbp-4], r9 ; store in memory
+    mov [rbp-48], r9 ; store in memory
     jmp .IncrementLoop
 
 .FinishLoop:
@@ -203,10 +206,10 @@ mov rsi, [rbp-56] ; yPos
 mov r14, 1 ; raw index in array
 ; x has to be within range + 3
 ; +
-; multiply yPos by [rbp-4]
+; multiply yPos by [rbp-48]
 
     mul rdi, 3       ; xPos * 3
-    mul rsi, [rbp-4] ; yPos * number of characters per row
+    mul rsi, [rbp-48] ; yPos * number of characters per row
     add r14, rdi     ; add xPos to index
     add r14, rsi     ; add yPos to index
     cmp rsi, 0       ; check if yPos is 0

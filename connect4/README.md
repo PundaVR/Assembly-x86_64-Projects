@@ -5,12 +5,12 @@
 - jnz <label> - always checks for EAX == 0
 
 ## STACK ALLOCATIONS
+- rbp-64 = GetTile args1 (RDI)
+- rbp-56 = GetTile args2 (RSI)
+- rbp-48 = GetTile number of characters per row
+XX- rbp-5 = GetTile number of rows
+XX- rbp-6 = GetTile tiles per row
 - rbp-1 = CompareTile return 
-- rbp-2 = GetTile args1 (RDI)
-- rbp-3 = GetTile args2 (RSI)
-- rbp-4 = GetTile number of characters per row
-- rbp-5 = GetTile number of rows
-- rbp-6 = GetTile tiles per row
 
 ## Functions:
 > ARGS: RDI, RSI, RDX
