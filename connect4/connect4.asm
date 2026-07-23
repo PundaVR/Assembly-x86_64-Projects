@@ -35,101 +35,14 @@ _start:
     mov rsi, msgStart ; buf: 64-bit memory address (MUST use rsi)
     mov rdx, lenStart ; count: length of string
     syscall
-;
-;
-; BULLSHIT TESTING BELOW!!!
-;
-;
 
-    mov  eax, 3         ; Number of bytes to sum 
-    mov  ebx, 0         ; Accumulator for sum
-    mov  ecx, arrBoard  ; Pointer to current byte
-    
-    inc ecx ; START FROM 2nd CHARACTER
-    mov [ecx], 'A'
-
-    add ecx, 3
-    mov [ecx], 'B'
-
-    add ecx, 3
-    mov [ecx], 'C'
-
-    sub ecx, 6
-
-    cmp byte [ecx], 'A'
-    jne isFalse
-
-    mov rdi, ttt
-    jmp fin
-isFalse:
-    mov rdi, fff
-    jmp fin
-fin:
-    call Print
-
-
-    ; PRINT BOARD
-    mov rdi, arrBoard
-    call Print
-
-    ; ADD LOOP
-
-
-    mov  eax,4      ;number bytes to be summed 
-    mov  ebx,0      ;EBX will store the sum
-    mov  ecx, arrNum     ;ECX will point to the current element to be summed
-
-
-
-
-    ;mov rdi, arrNum
-    ;call Print
-;
-    ;mov rdi, msgStart
-    ;call Print
-    
-    mov rdi, 1
-    mov rsi, 'A'
-    call CompareTile
-
-    cmp [rbp-1], 0
-    je alFalse
-
-    mov rdi, ttt
-    jmp alFin
-alFalse:
-    mov rdi, fff
-    jmp alFin
-alFin:
-    call Print
-
-; 0, 1, 2
-; 2, 5, 8
-;
-
-    mov rdi, debugLine
-    call Print
-
-    call InitBoard
-
-    mov rdi, 3
-    mov rsi, 2
-    call GetTile
-
-    ;mov rdi, rax
-    ;call Print
-    
-    ;mov rsi, arrBoard
-    ;mov rdx, len_arrBoard
-    ;mov rax, 1       
-    ;mov rdi, 1       
-    ;syscall
-
+    ;;; SET TILE ON BOARD
     mov rdi, 4
     mov rsi, 2
     mov rdx, 'O'
     call SetTile
 
+    ;;; PRINT THE BOARD
     mov rsi, arrBoard
     mov rdx, len_arrBoard
     mov rax, 1       
