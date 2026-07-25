@@ -10,6 +10,7 @@ section .data
     msgStart db 'Connect 4 in Assembly', 10, 0
     lenStart equ $ - msgStart
     
+
     player1 db '[O] Player 1',10 ; read 12 bytes to ignore newline 
     player2 db '[X] Player 2',10 ; read 13 bytes to include newline
 
@@ -17,9 +18,6 @@ section .data
     len_RequestInput equ $ - msgRequestInput
 
     newLineChar db 0xA ; newline char
-
-    msgBoardPos db ' 0  1  2  3  4  5  6  7  8  9', 10
-    len_BoardPos equ $-msgBoardPos
 
     arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
@@ -41,8 +39,10 @@ _start:
 SetupVariables:
     mov [rbp-1], 1 ; game active = true (1)  (only set zero if testing)
     call InitBoard ; MUST CALL THIS ON PROGRAM START
-
-
+    
+    mov [rbp-6], 'X' ;player1
+    mov [rbp-5], 'O' ;player2
+    mov [rbp-4], 'X' ; make player2 instead of 1, as loop will flip this to 1 
     ;;; SET TILE ON BOARD
     mov rdi, 7   ; x position
     mov rsi, 4   ; y position
@@ -54,6 +54,8 @@ GameLoop:
     ;;; PRINT THE BOARD (should be at the start of every gameloop)
     call PrintBoard
 
+    ; Determine what player turn it is
+    call NextPlayerTurn
 
     ;; GET USER INPUT
 .GetInput:
@@ -67,7 +69,7 @@ GameLoop:
     
     movzx rdi, byte [rbp-3]   ; x position
     movzx rsi, byte [rbp-2]   ; y position
-    mov dl, 'X' ; symbol to show
+    mov dl, [rbp-4]; 'X' ; symbol to show
     call SetTile
 
 
@@ -107,6 +109,27 @@ ApplyGravityToTile:
     mov [rbp-2], r12b
 
     mov rax, r12
+    ret
+
+NextPlayerTurn:
+    ; check current player
+    ; flip ig?
+    mov r13b, byte [rbp-6] ; r13b holds player 1
+    cmp byte [rbp-4], r13b
+    jne .CurrentPlayer2
+
+    mov r15b, byte [rbp-5] ; r15 holds player 2
+
+    mov [rbp-4], r15b 
+    jmp .SetPlayerTurn
+
+.CurrentPlayer2:
+    mov r14b, [rbp-6]
+    mov [rbp-4], r14b
+    jmp .SetPlayerTurn
+
+.SetPlayerTurn:
+    movzx rax, byte [rbp-4]
     ret
 
 GetUserInput:
