@@ -12,9 +12,12 @@
 - rbp-48 = InitBoard number of characters per row
 - rbp-40 = InitBoard number of rows in board
 - rbp 32 = SetTile: Character
+
+- rbp-7 = CompareTile return 
 XX- rbp-5 = GetTile number of rows
 XX- rbp-6 = GetTile tiles per row
-- rbp-1 = CompareTile return 
+
+- rbp-1 = Gamae Active = true
 
 ## Functions:
 > ARGS: RDI, RSI, RDX

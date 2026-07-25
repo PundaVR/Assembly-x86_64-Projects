@@ -31,7 +31,6 @@ _start:
     push rbp ; save the old base pointer (extern program called)
     mov rbp, rsp ; RBP takes the current snapshot of RSP
     sub rsp, 128 ; using rsp instead of rbp because that worked earlier
-    call InitBoard ; MUST CALL THIS ON PROGRAM START
 
     mov rax, 1        ; sys_write
     mov edi, 1        ; fd: stdout (clears upper 32 bits of rdi, saving 1 byte)
@@ -39,9 +38,16 @@ _start:
     mov rdx, lenStart ; count: length of string
     syscall
 
+SetupVariables:
+    mov [rbp-1], 0 ; game active = true (1) 
+    call InitBoard ; MUST CALL THIS ON PROGRAM START
+    
+
+
+Test:
     ;;; SET TILE ON BOARD
-    mov rdi, 7; x position
-    mov rsi, 4 ; y position
+    mov rdi, 7   ; x position
+    mov rsi, 4   ; y position
     mov rdx, 'X' ; symbol to show
     call SetTile
     
@@ -51,38 +57,25 @@ _start:
     mov rdi, msgRequestInput
     call GetUserInput
 
+
+    
+    mov rdi, [userInput]
+    call Print
+    
+    ;jmp exit
+
+
+GameLoop:
+    ; loop that runs forever
     mov rdi, 'hi'
     call Print
     mov rdi, 'poop'
     call PrintLn
-    
-    mov rdi, [userInput]
-    call Print
-    jmp exit
 
-Print:
-    ; RDI - contains text to print 
+    cmp [rbp-1], 0; check if game over
+    jne GameLoop
+    jmp exit 
 
-
-    mov [rbp-128], rdi
-    
-    lea rsi, [rbp-128]
-    mov rdx, 32
-    mov rax, 1       
-    mov rdi, 1     
-    syscall  
-
-    ret
-
-PrintLn: 
-    call Print
-
-    mov rsi, newLineChar
-    mov rdx, 1
-    mov rax, 1
-    mov rdi, 1
-    syscall
-    ret
 
 GetUserInput:
     ; RDI will be message to send (16 bytes)
@@ -223,13 +216,13 @@ CompareTile:
     ; index - RDI (dil) holds the index of the tile (in future should be 1-9, not increments of 3)
     ; value - RSI (sil) holds what we are comparing for (i.e. 'A')
     
-    ; [rbp-1] HOLDS BIT TO COMPARE
+    ; [rbp-7] HOLDS BIT TO COMPARE
 
     ; EXAMPLE USAGE:
     ; mov rdi, 1
     ; mov rsi, 'A'
     ; call CompareTile
-    ; cmp [rbp-1], 0
+    ; cmp [rbp-7], 0
     ; je LABEL_TO_JUMP
 
     mov rcx, arrBoard ; holds arrBoard - ECX (cl)
@@ -238,10 +231,10 @@ CompareTile:
     cmp byte [rcx], sil      ; compare byte at board pointer to RSI (sil)
     jne .compareFalse
 
-    mov [rbp-1], 1 ; RAX = TRUE
+    mov [rbp-7], 1 ; RAX = TRUE
     jmp .compared
 .compareFalse:
-    mov [rbp-1], 0 ; RAX = FALSE
+    mov [rbp-7], 0 ; RAX = FALSE
     jmp .compared
 .compared:
     ret
@@ -255,40 +248,29 @@ PrintBoard:
     syscall
     ret
 
-
-PrintShit:
-    ; RDI is the message we're sending
-    ; message length is determined in this function
-
-    push rdi ; put current value of rdi in stack (we give it to rsi later on)
-    ;mov rsi, rdi ; could also just do this instead of push/pop... but whatever :)
-
-    ; rcx is our counter variable, doesn't need anything exiting (thus why we clear it)
-    xor rcx, rcx        ; Clear counter
-    dec rcx             ; Set rcx to max value (0xFFFFFFFFFFFFFFFF)
-    xor al, al          ; Search for null byte (0x00)
-    repne scasb         ; Scan rdi until 0x00 is found (repne scasb always checks RDI)
-    ; the loop modifies rcx (x86_64 works this way, and will always use rcx as a counter)
+Print:
+    ; RDI - contains text to print 
 
 
-    not rcx             ; Invert bitmask to get string length + 1
-    dec rcx             ; Subtract 1 to drop the null byte count (rcx now holds exact len)
-
-    mov rax, 1 ; sys_write
-    mov edi, 1 ; fd: stdout
+    mov [rbp-128], rdi
     
-    pop rsi ; pop gets last thing pushed to stack (rdi) - don't need; mov rsi, rdi ; string
-    
-    mov rdx, rcx ; message length
-    syscall
+    lea rsi, [rbp-128]
+    mov rdx, 32
+    mov rax, 1       
+    mov rdi, 1     
+    syscall  
 
     ret
 
+PrintLn: 
+    call Print
 
-
-
-
-
+    mov rsi, newLineChar
+    mov rdx, 1
+    mov rax, 1
+    mov rdi, 1
+    syscall
+    ret
 
 
 ; should always be last thing in code
