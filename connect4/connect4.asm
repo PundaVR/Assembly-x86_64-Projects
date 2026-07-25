@@ -65,7 +65,6 @@ GameLoop:
     cmp eax, 0 ; validate user input
     je .GetInput    
 
-    call ApplyGravityToTile
     
     movzx rdi, byte [rbp-3]   ; x position
     movzx rsi, byte [rbp-2]   ; y position
@@ -274,11 +273,22 @@ ParseUserInput:
     ;mov rsi, yPos
     ;mov rdx, char
     ;call SetTile
+    jmp .CheckForGravity
+    
+.CheckForGravity:
+    call ApplyGravityToTile
+    cmp rax, 0
+    jl .GravityFailed
 
+.ParseSuccess:
     mov rax, 1
     ret
 
 .AsciiFailed:
+    mov rax, 0
+    ret
+
+.GravityFailed:
     mov rax, 0
     ret
 
