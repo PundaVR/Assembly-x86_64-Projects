@@ -21,7 +21,7 @@ section .data
     msgBoardPos db ' 0  1  2  3  4  5  6  7  8  9', 10
     len_BoardPos equ $-msgBoardPos
 
-    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
 
 section .text
@@ -385,6 +385,15 @@ PrintBoard:
     mov r15, rax ; r15 holds number of tiles
 
     mov r13, 0
+    cmp r15, 9
+    jg .UseLettersInsteadOfNumbers
+    ; IF MORE THAN 10 TILES - USE LETTERS INSTEAD OF NUMBER
+    mov r14, 48 ; use Numbers as index 
+    jmp .StartBoardHeaderLoop
+
+.UseLettersInsteadOfNumbers:
+    mov r14, 65
+
 .StartBoardHeaderLoop:
     cmp r13, r15
     jg .EndBoardHeaderLoop
@@ -393,7 +402,7 @@ PrintBoard:
 
     mov rdi, r13
     ;add rdi, 65 ; TO USE LETTERS AS INDEX
-    add rdi, 48 ; TO USE NUMBERS AS INDEX  
+    add rdi, r14 ; TO USE NUMBERS AS INDEX  
     
     call Print
     mov rdi, ' '
