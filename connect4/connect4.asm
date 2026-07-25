@@ -41,36 +41,40 @@ _start:
 SetupVariables:
     mov [rbp-1], 0 ; game active = true (1) 
     call InitBoard ; MUST CALL THIS ON PROGRAM START
-    
 
 
-Test:
+GameLoop:
+    ; loop that runs forever
+
+
     ;;; SET TILE ON BOARD
     mov rdi, 7   ; x position
     mov rsi, 4   ; y position
     mov rdx, 'X' ; symbol to show
     call SetTile
     
-    ;;; PRINT THE BOARD
+    ;;; PRINT THE BOARD (should be at the end of every gameloop)
     call PrintBoard
 
+    ;; GET USER INPUT
     mov rdi, msgRequestInput
     call GetUserInput
+    call ParseUserInput ; VALIDATE INPUT
+    ; ACT ON INPUT
+    ;mov rdi, [rbp-3]
+    ;mov rsi, [rbp-2]
+    ;mov rdx, 'X' 
+    ;call SetTile
 
 
-    
-    mov rdi, [userInput]
+    mov rdi, rax ; rax holds [userInput]
     call Print
-    
-    ;jmp exit
 
 
-GameLoop:
-    ; loop that runs forever
-    mov rdi, 'hi'
-    call Print
     mov rdi, 'poop'
     call PrintLn
+    
+
 
     cmp [rbp-1], 0; check if game over
     jne GameLoop
@@ -88,12 +92,63 @@ GetUserInput:
     syscall 
 
     mov rsi, userInput
-    mov rdx, 32
+    mov rdx, 2
     mov rax, 0
     mov rdi, 0
     syscall
 
-    mov rax, userInput
+    mov rax, [userInput]
+    ret
+
+ValidateUserInput:
+    ; return true or false (0, 1)
+    ret
+
+ParseUserInput:
+; User input can be any of the following:
+; - 'a1' (x0 y1)
+; - '3A' (x3 y0)
+; - '27' (x2 y7)
+; - 'DE' (x3 y4)
+; - 'A' (just X) - in the case of only 1 byte, its just X pos
+
+; Need to validate X and Y input, each is 1 byte
+; - we always only check for 2 bytes, so should be an easy loop
+; - convert ascii to raw number (-48)
+; - do cmp checks
+; - give raw value to rdi,rsi
+
+    ; STORE IN MEMORY EACH BYTE
+    mov byte [rbp-3], al ; xPos
+    mov byte [rbp-2], ah ; yPos
+    ;inc rax
+    ;mov r9b, byte [rax]
+    
+    
+    ; PRINT OUT POSITIONS
+    mov rdi, 'X POS: '
+    call Print
+    mov dil, [rbp-3]
+    call PrintLn
+
+    mov rdi, 'Y POS: '
+    call Print
+    mov dil, [rbp-2]
+    call PrintLn
+
+    mov rdi, ''
+    call PrintLn
+
+
+
+
+
+
+.SetTileFromUserInput:
+    ;mov rdi, xPos
+    ;mov rsi, yPos
+    ;mov rdx, char
+    ;call SetTile
     ret
 
 
@@ -241,6 +296,9 @@ CompareTile:
 
 
 PrintBoard:
+    ;mov rdi, [msgBoardPos]
+    ;call PrintLn
+
     mov rsi, arrBoard
     mov rdx, len_arrBoard
     mov rax, 1       

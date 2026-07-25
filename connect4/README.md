@@ -17,6 +17,9 @@
 XX- rbp-5 = GetTile number of rows
 XX- rbp-6 = GetTile tiles per row
 
+- rbp-4 = Active User's Character Token i.e: 'X'
+- rbp-3 = Last X user input
+- rbp-2 = Last Y user input
 - rbp-1 = Gamae Active = true
 
 ## Functions:
