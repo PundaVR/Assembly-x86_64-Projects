@@ -39,12 +39,9 @@ _start:
     syscall
 
 SetupVariables:
-    mov [rbp-1], 0 ; game active = true (1) 
+    mov [rbp-1], 1 ; game active = true (1)  (only set zero if testing)
     call InitBoard ; MUST CALL THIS ON PROGRAM START
 
-
-GameLoop:
-    ; loop that runs forever
 
 
     ;;; SET TILE ON BOARD
@@ -52,9 +49,13 @@ GameLoop:
     mov rsi, 4   ; y position
     mov rdx, 'X' ; symbol to show
     call SetTile
-    
-    ;;; PRINT THE BOARD (should be at the end of every gameloop)
+
+
+GameLoop:
+    ; loop that runs forever
+    ;;; PRINT THE BOARD (should be at the start of every gameloop)
     call PrintBoard
+
 
     ;; GET USER INPUT
     mov rdi, msgRequestInput
@@ -78,7 +79,7 @@ GameLoop:
 
     cmp [rbp-1], 0; check if game over
     jne GameLoop
-    jmp exit 
+    jmp exit
 
 
 GetUserInput:
@@ -118,13 +119,15 @@ ParseUserInput:
 ; - do cmp checks
 ; - give raw value to rdi,rsi
 
-    ; STORE IN MEMORY EACH BYTE
+    ; STORE IN MEMORY EACH BYTE (from RAX)
     mov byte [rbp-3], al ; xPos
     mov byte [rbp-2], ah ; yPos
     ;inc rax
     ;mov r9b, byte [rax]
     
     
+    mov rdi, ''
+    call PrintLn
     ; PRINT OUT POSITIONS
     mov rdi, 'X POS: '
     call Print
@@ -136,15 +139,86 @@ ParseUserInput:
     mov dil, [rbp-2]
     call PrintLn
 
-    mov rdi, ''
+
+    ; CONVERT ASCII TO NUMBER
+    mov r10, -4 ; we always know its gonna be 2 characters!
+.AsciiStartLoop:
+    inc r10 ; -3 then -2 (then loop finish) - r10 is rbp pointer
+    mov r8b, [rbp+r10] ; r8b holds ASCII value
+    
+    mov r9b, r8b ; r9b will hold raw value
+    sub r9b, 48  ; sub -48 to turn ascii to raw value
+
+    ; r10 = 3 (rbp-3)
+    ; r10 = 2 (rbp-2)
+    ; r10 = 1 (jump out of loop)
+    cmp r10, -2 ; r10
+    jg .AsciiDone
+
+    cmp r9b, 9
+    jle .AsciiLessThanOrEqualTo9
+    jg .AsciiGreaterThan9
+
+    
+.AsciiGreaterThan9:
+    cmp r9b, 17 ; 65(A) - 48 = 17
+    jl .AsciiLessThan0
+    cmp r9b, 42 ; 90(Z) - 48 = 42
+    jg .AsciiProbablyLowercase
+
+    mov rdi, 'UPPER'
+
+    ; SUBTRACT TO GET RAW
+    sub r9b, 17
+
+    call PrintLn
+    jmp .AsciiLooped
+
+.AsciiProbablyLowercase:
+    mov rdi, 'LOWER'
+    call PrintLn
+    ; SUBTRACT TO GET UPPERCASE (from lower)
+    sub r9b, 32 ; lower to upper 
+    sub r9b, 17 ; upper to num
+    jmp .AsciiLooped
+
+.AsciiLessThanOrEqualTo9:
+    cmp r9b, 0
+    jl .AsciiLessThan0 ; CHECK IF NOT NUM
+    mov rdi, 'IS NUM'
+    call PrintLn
+    jmp .AsciiLooped
+
+.AsciiLessThan0:
+    mov rdi, 'NOT NUMB'
+    call PrintLn
+    jmp .AsciiLooped
+
+.AsciiLooped: 
+    mov [rbp+r10], r9b
+    jmp .AsciiStartLoop
+
+.AsciiDone:
+    ; idk
+    mov rdi, 'RAW '
+    call Print
+    mov rdi, 'X POS: '
+    call Print
+    mov dil, [rbp-3]
+    add dil, 48
     call PrintLn
 
+    mov rdi, 'RAW '
+    call Print
+    mov rdi, 'Y POS: '
+    call Print
+    mov dil, [rbp-2]
+    add dil, 48
+    call PrintLn
 
+    mov rdi, 'aaa'
+    call PrintLn
 
-
-
-
-.SetTileFromUserInput:
     ;mov rdi, xPos
     ;mov rsi, yPos
     ;mov rdx, char
@@ -262,7 +336,6 @@ GetTile:
 
 
     add rcx, r14
-    ;mov [rcx], 'X'
     mov rax, rcx ; RETURN POINTER TO THE CORRECT TILE
     ret
 
