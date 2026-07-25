@@ -43,15 +43,11 @@ SetupVariables:
     call InitBoard ; MUST CALL THIS ON PROGRAM START
 
 
-
     ;;; SET TILE ON BOARD
     mov rdi, 7   ; x position
     mov rsi, 4   ; y position
     mov rdx, 'X' ; symbol to show
     call SetTile
-
-    
-
 
 GameLoop:
     ; loop that runs forever
@@ -60,27 +56,12 @@ GameLoop:
 
 
     ;; GET USER INPUT
-    mov rdi, msgRequestInput
 .GetInput:
+    mov rdi, msgRequestInput
     call GetUserInput
     call ParseUserInput ; VALIDATE INPUT
-    cmp eax, 0
-    je .GetInput
-
-    ; ACT ON INPUT
-    ;mov rdi, [rbp-3]
-    ;mov rsi, [rbp-2]
-    ;mov rdx, 'X' 
-    ;call SetTile
-
-
-    mov rdi, rax ; rax holds [userInput]
-    call Print
-
-
-    mov rdi, 'poop'
-    call PrintLn
-    
+    cmp eax, 0 ; validate user input
+    je .GetInput    
 
     
     movzx rdi, byte [rbp-3]   ; x position
@@ -96,7 +77,12 @@ GameLoop:
 
 
 GetUserInput:
-    ; RDI will be message to send (16 bytes)
+    ; RDI will input message ENUM {
+    ; 0 = "Invalid Input"
+    ; 1 = "1 Digit Position Input"
+    ; 2 = "2 Digit Position Input"
+    ; }
+    ; 
     ; RETURN: RAX userInput (also stored in 'userInput')
 
     mov rsi, rdi
@@ -114,9 +100,6 @@ GetUserInput:
     mov rax, [userInput]
     ret
 
-ValidateUserInput:
-    ; return true or false (0, 1)
-    ret
 
 ParseUserInput:
 ; User input can be any of the following:
@@ -139,18 +122,18 @@ ParseUserInput:
     ;mov r9b, byte [rax]
     
     
-    mov rdi, ''
-    call PrintLn
-    ; PRINT OUT POSITIONS
-    mov rdi, 'X POS: '
-    call Print
-    movzx rdi, byte [rbp-3]
-    call PrintLn
-
-    mov rdi, 'Y POS: '
-    call Print
-    movzx rdi, byte [rbp-2]
-    call PrintLn
+    ;  mov rdi, ''
+    ;  call PrintLn
+    ;  ; PRINT OUT POSITIONS
+    ;  mov rdi, 'X POS: '
+    ;  call Print
+    ;  movzx rdi, byte [rbp-3]
+    ;  call PrintLn
+  
+    ;  mov rdi, 'Y POS: '
+    ;  call Print
+    ;  movzx rdi, byte [rbp-2]
+    ;  call PrintLn
 
 
     ; CONVERT ASCII TO NUMBER
@@ -179,12 +162,13 @@ ParseUserInput:
     cmp r9b, 42 ; 90(Z) - 48 = 42
     jg .AsciiProbablyLowercase
 
-    mov rdi, 'UPPER'
 
     ; SUBTRACT TO GET RAW
     sub r9b, 17
 
+    mov rdi, 'UPPER'
     call PrintLn
+    
     jmp .AsciiLooped
 
 .AsciiProbablyLowercase:
@@ -203,7 +187,7 @@ ParseUserInput:
     jmp .AsciiLooped
 
 .AsciiLessThan0:
-    mov rdi, 'NOT NUMB'
+    mov rdi, 'INVALID'
     call PrintLn
     jmp .AsciiFailed
 
@@ -229,8 +213,6 @@ ParseUserInput:
     add dil, 48
     call PrintLn
 
-    mov rdi, 'aaa'
-    call PrintLn
 
     ;mov rdi, xPos
     ;mov rsi, yPos
@@ -284,7 +266,7 @@ InitBoard:
     jmp .StartLoop
 
 .FoundNewLine:
-    mov rdi, 'FOUNLINE'
+    mov rdi, 'NEW LINE'
     call PrintLn
 
     inc r10 ; inc amount of 0xA found
