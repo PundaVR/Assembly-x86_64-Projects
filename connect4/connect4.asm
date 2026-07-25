@@ -66,7 +66,7 @@ GameLoop:
     call ParseUserInput ; VALIDATE INPUT
     cmp eax, 0
     je .GetInput
-    
+
     ; ACT ON INPUT
     ;mov rdi, [rbp-3]
     ;mov rsi, [rbp-2]
@@ -106,7 +106,7 @@ GetUserInput:
     syscall 
     
     mov rsi, userInput
-    mov rdx, 2
+    mov rdx, 3
     mov rax, 0
     mov rdi, 0
     syscall
