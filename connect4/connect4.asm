@@ -50,6 +50,8 @@ SetupVariables:
     mov rdx, 'X' ; symbol to show
     call SetTile
 
+    
+
 
 GameLoop:
     ; loop that runs forever
@@ -75,6 +77,16 @@ GameLoop:
     mov rdi, 'poop'
     call PrintLn
     
+    
+
+    ;;; SET TILE ON BOARD
+    mov r8b, [rbp-3]
+    mov r9b, [rbp-2]
+    
+    movzx rdi, byte [rbp-3]   ; x position
+    movzx rsi, byte [rbp-2]   ; y position
+    mov dl, 'X' ; symbol to show
+    call SetTile
 
 
     cmp [rbp-1], 0; check if game over
