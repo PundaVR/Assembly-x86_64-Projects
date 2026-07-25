@@ -61,8 +61,12 @@ GameLoop:
 
     ;; GET USER INPUT
     mov rdi, msgRequestInput
+.GetInput:
     call GetUserInput
     call ParseUserInput ; VALIDATE INPUT
+    cmp eax, 0
+    je .GetInput
+    
     ; ACT ON INPUT
     ;mov rdi, [rbp-3]
     ;mov rsi, [rbp-2]
@@ -88,6 +92,7 @@ GameLoop:
     cmp [rbp-1], 0; check if game over
     jne GameLoop
     jmp exit
+    ret
 
 
 GetUserInput:
@@ -99,7 +104,7 @@ GetUserInput:
     mov rax, 1
     mov rdi, 1
     syscall 
-
+    
     mov rsi, userInput
     mov rdx, 2
     mov rax, 0
@@ -139,12 +144,12 @@ ParseUserInput:
     ; PRINT OUT POSITIONS
     mov rdi, 'X POS: '
     call Print
-    mov dil, [rbp-3]
+    movzx rdi, byte [rbp-3]
     call PrintLn
 
     mov rdi, 'Y POS: '
     call Print
-    mov dil, [rbp-2]
+    movzx rdi, byte [rbp-2]
     call PrintLn
 
 
@@ -200,7 +205,7 @@ ParseUserInput:
 .AsciiLessThan0:
     mov rdi, 'NOT NUMB'
     call PrintLn
-    jmp .AsciiLooped
+    jmp .AsciiFailed
 
 .AsciiLooped: 
     mov [rbp+r10], r9b
@@ -231,6 +236,12 @@ ParseUserInput:
     ;mov rsi, yPos
     ;mov rdx, char
     ;call SetTile
+
+    mov rax, 1
+    ret
+
+.AsciiFailed:
+    mov rax, 0
     ret
 
 
