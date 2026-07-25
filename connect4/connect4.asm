@@ -373,6 +373,41 @@ PrintBoard:
     ;mov rdi, [msgBoardPos]
     ;call PrintLn
 
+    ; rax / rbx
+    ; char per row / 3
+    movzx rax, byte [rbp-48] 
+    dec rax
+    mov r14, rax ; r14 holds number of chars
+
+    xor rdx, rdx
+    mov rbx, 3
+    div rbx
+    mov r15, rax ; r15 holds number of tiles
+
+    mov r13, 0
+.StartBoardHeaderLoop:
+    cmp r13, r15
+    jg .EndBoardHeaderLoop
+    mov rdi, ' '
+    call Print
+
+    mov rdi, r13
+    ;add rdi, 65 ; TO USE LETTERS AS INDEX
+    add rdi, 48 ; TO USE NUMBERS AS INDEX  
+    
+    call Print
+    mov rdi, ' '
+    call Print
+    inc r13
+    jmp .StartBoardHeaderLoop
+
+.EndBoardHeaderLoop:
+    mov rdi, ''
+    call PrintLn
+
+    ; Result: RAX = 6 (quotient), RDX = 1 (remainder)
+
+
     mov rsi, arrBoard
     mov rdx, len_arrBoard
     mov rax, 1       
