@@ -14,8 +14,6 @@
 - rbp 32 = SetTile: Character
 
 - rbp-7 = CompareTile return 
-XX- rbp-5 = GetTile number of rows
-XX- rbp-6 = GetTile tiles per row
 
 - rbp-4 = Active User's Character Token i.e: 'X'
 - rbp-3 = Last X user input

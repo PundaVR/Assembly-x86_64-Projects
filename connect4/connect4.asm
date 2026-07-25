@@ -21,7 +21,7 @@ section .data
     msgBoardPos db ' 0  1  2  3  4  5  6  7  8  9', 10
     len_BoardPos equ $-msgBoardPos
 
-    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
 
 section .text
@@ -63,6 +63,7 @@ GameLoop:
     cmp eax, 0 ; validate user input
     je .GetInput    
 
+    call ApplyGravityToTile
     
     movzx rdi, byte [rbp-3]   ; x position
     movzx rsi, byte [rbp-2]   ; y position
@@ -75,6 +76,50 @@ GameLoop:
     jmp exit
     ret
 
+
+ApplyGravityToTile:
+    ; modify y until tile found (or reached end)
+    ; rbp-40 holds number of rows in board
+    ; loop every row, at x pos
+    ;   until we get to END or a non-empty tile
+
+    mov r12, 0 ; counter (yPos)
+    movzx r13, byte [rbp-3]
+
+.StartGravityLoop:
+    cmp r12, [rbp-40] ; check if Y == amount of rows
+    jge .EndGravityLoop
+
+    ;movzx rdi, byte [rbp-3]
+    ;mov rsi, r12
+    ;mov rdx, 'B'
+    ;call SetTile
+
+    movzx rdi, byte [rbp-3] ; xPos
+    mov rsi, r12
+    call GetTile
+
+    cmp byte [rax], ' ' ;32 ;space
+    jne .ISBAD
+    inc r12
+
+.ISGOOD:
+    mov rdi, 'ISEMPTY'
+    call PrintLn
+    jmp .StartGravityLoop
+
+.ISBAD: 
+    mov rdi, 'TILEOCU'
+    call PrintLn
+
+    dec r12
+    mov [rbp-2], r12b
+
+    jmp .EndGravityLoop
+
+.EndGravityLoop:
+    mov rax, r12
+    ret
 
 GetUserInput:
     ; RDI will input message ENUM {
