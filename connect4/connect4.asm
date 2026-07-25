@@ -80,8 +80,9 @@ GameLoop:
 ApplyGravityToTile:
     ; modify y until tile found (or reached end)
     ; rbp-40 holds number of rows in board
-    ; loop every row, at x pos
+    ; iterate through every row, at x pos
     ;   until we get to END or a non-empty tile
+    ; return new yPos (rax) ALSO update [rbp-3] to hold new yPos
 
     mov r12, 0 ; counter (yPos)
     movzx r13, byte [rbp-3]
@@ -90,34 +91,21 @@ ApplyGravityToTile:
     cmp r12, [rbp-40] ; check if Y == amount of rows
     jge .EndGravityLoop
 
-    ;movzx rdi, byte [rbp-3]
-    ;mov rsi, r12
-    ;mov rdx, 'B'
-    ;call SetTile
-
     movzx rdi, byte [rbp-3] ; xPos
     mov rsi, r12
     call GetTile
 
     cmp byte [rax], ' ' ;32 ;space
-    jne .ISBAD
+    jne .EndGravityLoop
+    
     inc r12
-
-.ISGOOD:
-    mov rdi, 'ISEMPTY'
-    call PrintLn
     jmp .StartGravityLoop
 
-.ISBAD: 
-    mov rdi, 'TILEOCU'
-    call PrintLn
-
+.EndGravityLoop:
+    
     dec r12
     mov [rbp-2], r12b
 
-    jmp .EndGravityLoop
-
-.EndGravityLoop:
     mov rax, r12
     ret
 
