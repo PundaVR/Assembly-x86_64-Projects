@@ -1,26 +1,28 @@
 DEFAULT REL
-
+;;; PROJECT DATE: 23/07/2026
+; First proper project in asm
+; what
 section .bss
+    printText resb 32
+    userInput resb 32
 
 section .data
     msgStart db 'Connect 4 in Assembly', 10, 0
     lenStart equ $ - msgStart
-
-    arr1 times 4 db '[ ]'
-    lenArr1 equ $ - arr1
-
-    arrNum db 1,3,5,8,3,4,6,7
-
-    debugLine db '=====================================',10,0
     
-    ttt db 'TRUE',10,0
-    fff db 'FALSE',10,0
+    player1 db '[O] Player 1',10 ; read 12 bytes to ignore newline 
+    player2 db '[X] Player 2',10 ; read 13 bytes to include newline
 
-    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10;'[0][1][2][3][4][5][6]', 10
+    msgRequestInput db 'Enter position to drop token (i.e. 3): '
+    len_RequestInput equ $ - msgRequestInput
+
+    newLineChar db 0xA ; newline char
+
+    msgBoardPos db ' 0  1  2  3  4  5  6  7  8  9', 10
+    len_BoardPos equ $-msgBoardPos
+
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
-
-
-    sum db 0
 
 section .text
     global _start
@@ -28,7 +30,8 @@ section .text
 _start:
     push rbp ; save the old base pointer (extern program called)
     mov rbp, rsp ; RBP takes the current snapshot of RSP
-    sub rsp, 64 ; using rsp instead of rbp because that worked earlier
+    sub rsp, 128 ; using rsp instead of rbp because that worked earlier
+    call InitBoard ; MUST CALL THIS ON PROGRAM START
 
     mov rax, 1        ; sys_write
     mov edi, 1        ; fd: stdout (clears upper 32 bits of rdi, saving 1 byte)
@@ -37,19 +40,69 @@ _start:
     syscall
 
     ;;; SET TILE ON BOARD
-    mov rdi, 4
-    mov rsi, 2
-    mov rdx, 'O'
+    mov rdi, 7; x position
+    mov rsi, 4 ; y position
+    mov rdx, 'X' ; symbol to show
     call SetTile
-
+    
     ;;; PRINT THE BOARD
-    mov rsi, arrBoard
-    mov rdx, len_arrBoard
+    call PrintBoard
+
+    mov rdi, msgRequestInput
+    call GetUserInput
+
+    mov rdi, 'hi'
+    call Print
+    mov rdi, 'poop'
+    call PrintLn
+    
+    mov rdi, [userInput]
+    call Print
+    jmp exit
+
+Print:
+    ; RDI - contains text to print 
+
+
+    mov [rbp-128], rdi
+    
+    lea rsi, [rbp-128]
+    mov rdx, 32
     mov rax, 1       
-    mov rdi, 1       
+    mov rdi, 1     
+    syscall  
+
+    ret
+
+PrintLn: 
+    call Print
+
+    mov rsi, newLineChar
+    mov rdx, 1
+    mov rax, 1
+    mov rdi, 1
+    syscall
+    ret
+
+GetUserInput:
+    ; RDI will be message to send (16 bytes)
+    ; RETURN: RAX userInput (also stored in 'userInput')
+
+    mov rsi, rdi
+    mov rdx, len_RequestInput
+    mov rax, 1
+    mov rdi, 1
+    syscall 
+
+    mov rsi, userInput
+    mov rdx, 32
+    mov rax, 0
+    mov rdi, 0
     syscall
 
-    jmp exit
+    mov rax, userInput
+    ret
+
 
 InitBoard:
     ; We know there are 10 characters per line
@@ -73,11 +126,11 @@ InitBoard:
     mov r8, arrBoard
     mov r9, 0 ; counter variable
     mov r10, 0 ; how many 0xA found
-    xor r12, r12 ; holds amount of characters per line
+    
 .StartLoop:
     ; CHECK IF REACHED END OF BOARD
     cmp r9, len_arrBoard ;compare counter index to arrBoardLength 
-    je .FinishLoop ; IF counter > arrBoardLength
+    je .FinishLoop ; IF counter == arrBoardLength
     
     ; LOOK FOR NEWLINE CHARACTER
     cmp byte [r8], 10
@@ -90,19 +143,19 @@ InitBoard:
     jmp .StartLoop
 
 .FoundNewLine:
-    mov rdi, ttt
-    call Print
+    mov rdi, 'FOUNLINE'
+    call PrintLn
 
     inc r10 ; inc amount of 0xA found
     cmp r10, 1
     jne .IncrementLoop ; if NOT first 0xA, continue
 
     ;ELSE:
-    mov r12, r9 ; r12 now holds amount of chars per line 
-    mov [rbp-48], r9 ; store in memory
+    mov [rbp-48], r9 ; store in memory amount of chars per line
     jmp .IncrementLoop
 
 .FinishLoop:
+    mov [rbp-40], r10 ; store how many lines there are
     ret
 
 
@@ -121,9 +174,9 @@ SetTile:
     ; mov rdx, 'O'
     ; call SetTile
 
-    mov [rbp-40], rdx ; store RDX in stack
+    mov [rbp-32], rdx ; store RDX in stack
     call GetTile ; get the tile (this overwrites rdi/rsi/rdx/etc)
-    mov r15b, [rbp-40] ; get the 8 bytes from rbp
+    mov r15b, [rbp-32] ; get the 8 bytes from rbp
     mov [rax], r15b ; write the character to the tile position
     ret
 
@@ -133,24 +186,18 @@ GetTile:
     ; RETURN: pointer to correct tile (char in string)
     mov [rbp-64], rdi ; store arg1 in memory (index)
     mov [rbp-56], rsi;
-    mov r8, arrBoard
-    mov r9, 0 ; counter variable
-    mov r10, 0 ; how many 0xA found
-    xor r12, r12 ; holds amount of characters per line
-    mov r13, 0 ; number of tiles per row
 
 .ConvertArgToRawIndex:
 
-; need to convert RDI into a raw index
-; to get amount of tiles per row: ([r12]-1) / 3 
-
-mov r13, 0 ; amount of tiles per row
-mov rdi, [rbp-64] ; xPos
-mov rsi, [rbp-56] ; yPos
-mov r14, 1 ; raw index in array
-; x has to be within range + 3
-; +
-; multiply yPos by [rbp-48]
+    ; need to convert RDI into a raw index
+    ; to get amount of tiles per row: ([r12]-1) / 3 
+    
+    mov rdi, [rbp-64] ; xPos
+    mov rsi, [rbp-56] ; yPos
+    mov r14, 1 ; raw index in array
+    ; x has to be within range + 3
+    ; +
+    ; multiply yPos by [rbp-48]
 
     mul rdi, 3       ; xPos * 3
     mul rsi, [rbp-48] ; yPos * number of characters per row
@@ -200,12 +247,16 @@ CompareTile:
     ret
 
 
-
-PrintString:
-    ; RDI - contains 
+PrintBoard:
+    mov rsi, arrBoard
+    mov rdx, len_arrBoard
+    mov rax, 1       
+    mov rdi, 1       
+    syscall
     ret
 
-Print:
+
+PrintShit:
     ; RDI is the message we're sending
     ; message length is determined in this function
 

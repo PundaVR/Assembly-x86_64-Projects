@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+  
+    {
+      "name": "Debug Connect4 Assembly",
+      "type": "lldb",
+      "request": "launch",
+      "program": "/home/pablo/Projects/connect4/connect4",
+      "cwd": "/home/pablo/Projects/connect4",
+      "args": [],
+      "stopOnEntry": true,
+      "breakpointMode": "file",
+      "initCommands": [
+        "settings set target.x86-disassembly-flavor intel"
+      ]
+    }
+  ]
+}
