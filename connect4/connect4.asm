@@ -44,10 +44,10 @@ SetupVariables:
     mov [rbp-5], 'O' ;player2
     mov [rbp-4], 'X' ; make player2 instead of 1, as loop will flip this to 1 
     ;;; SET TILE ON BOARD
-    mov rdi, 7   ; x position
-    mov rsi, 4   ; y position
-    mov rdx, 'X' ; symbol to show
-    call SetTile
+    ;mov rdi, 7   ; x position
+    ;mov rsi, 4   ; y position
+    ;mov rdx, 'X' ; symbol to show
+    ;call SetTile
 
 GameLoop:
     ; loop that runs forever
@@ -80,6 +80,20 @@ GameLoop:
 
     cmp [rbp-1], 0; check if game over
     jne GameLoop
+.GameOver:
+    call PrintBoard
+
+    mov rdi, "GAME "
+    call Print
+    mov rdi, "OVER "
+    call Print
+    mov rdi, "MAN! "
+    call Print
+    mov rdi, "GAME "
+    call Print
+    mov rdi, "OVER!"
+    call PrintLn
+
     jmp exit
     ret
 
@@ -359,6 +373,7 @@ DidPlacementWinGame:
 .WonTheGame:
     mov rdi, "FUCK YES"
     call PrintLn
+    mov [rbp-1], byte 0
     ret
 .FinishWinningChecks:
     mov rdi, 'notwin'
