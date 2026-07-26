@@ -74,6 +74,10 @@ GameLoop:
     mov rdx, 0 ; check from left
     call DidPlacementWinGame
 
+    
+    mov rdi, 'wtfwtf'
+    call PrintLn
+
     cmp [rbp-1], 0; check if game over
     jne GameLoop
     jmp exit
@@ -103,12 +107,12 @@ DidPlacementWinGame:
     
     mov r13, r15 ; r13 holds Y (we iterate through) 
 
-.StartCheckLoop:
-    
     mov [rbp-11], byte 0
     mov [rbp-12], byte 0
     mov [rbp-13], byte 0
     mov [rbp-14], byte 0
+
+.StartCheckLoop:
 
     cmp byte [rbp-7], 3 ; 3 = is dont do any checks, 4 = idk
     je .EndWinningChecks
@@ -267,6 +271,9 @@ DidPlacementWinGame:
     ; add r13, r15
 
 .CheckFirst:   
+    mov rdi, 'CHK 1st'
+    call PrintLn
+    
     lea rdi, [r12+r14]
     lea rsi, [r13+r15]
     call GetTile
@@ -279,21 +286,46 @@ DidPlacementWinGame:
     call IncrementConnections
 
 .CheckSecond:
+    mov rdi, 'CHK 2nd'
+    call PrintLn
+
     lea rdi, [r12*2+r14]
     lea rsi, [r13*2+r15]
     call GetTile
 
+      pop r15
+    pop r14
+
+
+    mov dil, [rbp-4] ; COMPARE IF TILE IS SAME
+    cmp byte [rax], dil
+    jne .StartCheckLoop
+
+    
+
+    ; go increment the connection count, and return to next register    
+    call IncrementConnections
+
 .CheckThird:
+    mov rdi, 'CHK 3rd'
+    call PrintLn
+    
     lea rdi, [r12+r12*2]
     add rdi, r14
     lea rsi, [r13+r13*2]
     add rsi, r15
     call GetTile
 
-    
-    pop r15
-    pop r14
+    mov dil, [rbp-4] ; COMPARE IF TILE IS SAME
+    cmp byte [rax], dil
+    jne .StartCheckLoop
 
+    ; go increment the connection count, and return to next register    
+    call IncrementConnections
+
+
+
+  
     ; IF NOT CONNECT4:    
     jmp .StartCheckLoop
 
@@ -319,7 +351,7 @@ DidPlacementWinGame:
     cmp r8, 4
     jge .WonTheGame
 
-
+    
 
     inc r9
     jmp .EndWinningLoop
@@ -327,12 +359,18 @@ DidPlacementWinGame:
 .WonTheGame:
     mov rdi, "FUCK YES"
     call PrintLn
+    ret
 .FinishWinningChecks:
+    mov rdi, 'notwin'
+    call PrintLn
     ret
 
 IncrementConnections:
+    mov rdi, 'IncrConn'
+    call PrintLn
     push r12
     push r13
+
 
     mov rdi, r12
     mov rsi, r13
@@ -352,6 +390,11 @@ IncrementConnections:
 
 
 .GotVector:
+    push rdi
+    mov rdi, 'fuckthis'
+    call PrintLn
+    pop rdi ; LOl
+
     mov [rbp-10], dl ; store vector for this turn
 
     cmp dl, 1
@@ -364,19 +407,19 @@ IncrementConnections:
 
 
 .VectorIsAlongY:
-    inc [rbp-13]
+    inc byte [rbp-13]
     jmp .FinishIncrementing 
 
 .VectorIsAlongX:
-    inc [rbp-14]
+    inc byte [rbp-14]
     jmp .FinishIncrementing
 
 .VectorIsTwo: ; POSITIVE DIAG
-    inc [rbp-11]
+    inc byte [rbp-11]
     jmp .FinishIncrementing
 
 .VectorIsZero: ; NEGATIVE DIAG
-    inc [rbp-12]
+    inc byte [rbp-12]
     jmp .FinishIncrementing
 
 .FinishIncrementing:
@@ -459,7 +502,7 @@ GetUserInput:
     movzx r15, byte [rbp-8]
 
     mov rsi, userInput
-    lea rdx, byte [rbp-8]
+    mov rdx, 2;lea rdx, byte [rbp-8]
     mov rax, 0
     mov rdi, 0
     syscall
