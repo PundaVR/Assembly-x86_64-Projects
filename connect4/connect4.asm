@@ -39,7 +39,7 @@ _start:
 SetupVariables:
     mov [rbp-1], 1 ; game active = true (1)  (only set zero if testing)
     call InitBoard ; MUST CALL THIS ON PROGRAM START
-    mov [rbp-8], 2
+    mov [rbp-8], 2 ; 2 for only x ; 3 for x and y input
     mov [rbp-6], 'X' ;player1
     mov [rbp-5], 'O' ;player2
     mov [rbp-4], 'X' ; make player2 instead of 1, as loop will flip this to 1 
@@ -71,12 +71,81 @@ GameLoop:
     mov dl, [rbp-4]; 'X' ; symbol to show
     call SetTile
 
+    call DidPlacementWinGame
 
     cmp [rbp-1], 0; check if game over
     jne GameLoop
     jmp exit
     ret
 
+
+DidPlacementWinGame:
+    ; RDI x pos
+    ; RSI y pos
+    
+
+
+    ; rbp-64 holds GetTile: x
+    ; rbp-4 holds last player turn
+    ; rbp-3 holds last X user input
+
+    ; check surrounding cells
+    ; if one matching, check following 2 cells
+    ; if all match, WIN!
+
+    movzx r14, byte [rbp-64] ; original user xPos
+    movzx r15, byte [rbp-56] ; original user yPos
+
+    mov r12, r14 ; r12 holds X (we iterate through)
+    mov r13, r15 ; r13 holds Y (we iterate through) 
+
+StartCheckLoops:
+    
+
+.CheckLeft:
+    dec r12  ; Check -x first
+    jmp .LookForMatchingTile
+
+.CheckMiddle:
+    inc r12
+    jmp .LookForMatchingTile
+
+.CheckRight:
+    inc r12
+    jmp .LookForMatchingTile
+
+.FinishChecks:
+    ret
+
+.LookForMatchingTile:
+    mov rdi, r12
+    mov rsi, r13
+    call GetTile
+    mov dil, [rbp-4]
+    cmp byte [rax], dil
+    je .FoundMatchingTile
+
+
+    ;mov rdi, r14
+    ;mov rsi, r15
+    ;mov rdx, 'W'
+    ;call SetTile
+    ;jmp .CheckLeft
+    jmp .EndWinningChecks
+
+.FoundMatchingTile:
+
+    mov rdi, r12
+    mov rsi, r13
+    mov rdx, 'W'
+    call SetTile
+
+    jmp .CheckLeft
+
+
+.EndWinningChecks:
+
+    ret
 
 ApplyGravityToTile:
     ; modify y until tile found (or reached end)

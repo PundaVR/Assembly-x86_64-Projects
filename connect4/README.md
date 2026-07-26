@@ -19,7 +19,7 @@
 - rbp-5 = Player2 Token i.e: 'O'
 - rbp-4 = Active User's Character Token i.e: 'X'
 - rbp-3 = Last X user input
-- rbp-2 = Last Y user input
+- rbp-2 = Last Y user input (effected by gravity)
 - rbp-1 = Game Active = true
 
 ## Functions:
