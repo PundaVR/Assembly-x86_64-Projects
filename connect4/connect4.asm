@@ -71,6 +71,7 @@ GameLoop:
     mov dl, [rbp-4]; 'X' ; symbol to show
     call SetTile
 
+    mov rdx, 0 ; check from left
     call DidPlacementWinGame
 
     cmp [rbp-1], 0; check if game over
@@ -82,9 +83,9 @@ GameLoop:
 DidPlacementWinGame:
     ; RDI x pos
     ; RSI y pos
+    ; RDX 0=left 1=right 2=middle (will work from 0 to 2)
+    ;     so passing 0 will do all three, passing 2 will only do middle
     
-
-
     ; rbp-64 holds GetTile: x
     ; rbp-4 holds last player turn
     ; rbp-3 holds last X user input
@@ -92,30 +93,77 @@ DidPlacementWinGame:
     ; check surrounding cells
     ; if one matching, check following 2 cells
     ; if all match, WIN!
-
+    mov [rbp-7], byte dl ; store RDX
+    mov [rbp-9], byte 0
     movzx r14, byte [rbp-64] ; original user xPos
     movzx r15, byte [rbp-56] ; original user yPos
 
     mov r12, r14 ; r12 holds X (we iterate through)
     mov r13, r15 ; r13 holds Y (we iterate through) 
 
-StartCheckLoops:
-    
+.StartCheckLoop:
+    cmp byte [rbp-7], 3 ; 3 = is dont do any checks, 4 = idk
+    je .EndWinningChecks
+    cmp byte [rbp-7], 1
+    jl .CheckLeft
+    je .CheckRight
+    jg .CheckMiddle 
+
+.IncrementCheckSide:
+    inc byte [rbp-7]
+    mov [rbp-9], byte 0
+    jmp .StartCheckLoop
 
 .CheckLeft:
+    cmp byte [rbp-9], 2 ;Check if tile counter > 2 (0,1,2)
+    jg .IncrementCheckSide
+    inc [rbp-9]
+
+    mov rdi, 'CHECK L'
+    call PrintLn 
     dec r12  ; Check -x first
     jmp .LookForMatchingTile
 
 .CheckMiddle:
+    cmp byte [rbp-9], 1 ;Check if tile counter > 2 (0,1,2)
+    jg .EndWinningChecks  ; AFTER WE CHECK MIDDLE - WE ARE FINISHED!
+    
+    inc [rbp-9]
+    mov rdi, 'CHECK M'
+    call PrintLn 
     inc r12
     jmp .LookForMatchingTile
 
 .CheckRight:
+    cmp byte [rbp-9], 2 ;Check if tile counter > 2 (0,1,2)
+    jg .IncrementCheckSide
+    inc [rbp-9]
+    mov rdi, 'CHECK R'
+    call PrintLn 
+    ; +X
+    ; all Y
     inc r12
+
+    mov rdi, r12 ; xPos in rdi
+    mov rsi, r13 ; yPos in rsi
+    call GetTile ; get tile at pos
+    mov dil, [rbp-4] ; get current player's turn 
+    cmp byte [rax], dil ; check if neigbour tile is same
+    je .FollowTile ; TRUE - tile is same, check following tiles
+    
     jmp .LookForMatchingTile
 
-.FinishChecks:
-    ret
+.FollowTile:
+    mov rdi, r14
+    mov rsi, r15
+
+    sub rdi, r12
+    sub rsi, r13
+
+    mov rdi, 1
+    jmp .StartCheckLoop
+    
+
 
 .LookForMatchingTile:
     mov rdi, r12
@@ -131,7 +179,7 @@ StartCheckLoops:
     ;mov rdx, 'W'
     ;call SetTile
     ;jmp .CheckLeft
-    jmp .EndWinningChecks
+    jmp .StartCheckLoop
 
 .FoundMatchingTile:
 
@@ -142,7 +190,7 @@ StartCheckLoops:
 
     sub r14, r12
 
-
+    ; prints '41' for example (r12 r14)
     mov rdi, r12
     add rdi, 48
     call Print
@@ -150,8 +198,13 @@ StartCheckLoops:
     add rdi, 48
     call PrintLn
 
-    jmp .CheckLeft
-
+    ; check our direction ,and jmp accordingly
+    cmp r14b, 0 
+    jg .StartCheckLoop
+    
+    mov rdi, 'idk bro'
+    call PrintLn
+    jmp .LookForMatchingTile
 
 .EndWinningChecks:
 
@@ -512,34 +565,6 @@ GetTile:
     pop r13
     pop r12
 
-    ret
-
-
-CompareTile:
-    ; index - RDI (dil) holds the index of the tile (in future should be 1-9, not increments of 3)
-    ; value - RSI (sil) holds what we are comparing for (i.e. 'A')
-    
-    ; [rbp-7] HOLDS BIT TO COMPARE
-
-    ; EXAMPLE USAGE:
-    ; mov rdi, 1
-    ; mov rsi, 'A'
-    ; call CompareTile
-    ; cmp [rbp-7], 0
-    ; je LABEL_TO_JUMP
-
-    mov rcx, arrBoard ; holds arrBoard - ECX (cl)
-    add rcx, rdi      ; add index to board pointer - RDI (dil) 
-    
-    cmp byte [rcx], sil      ; compare byte at board pointer to RSI (sil)
-    jne .compareFalse
-
-    mov [rbp-7], 1 ; RAX = TRUE
-    jmp .compared
-.compareFalse:
-    mov [rbp-7], 0 ; RAX = FALSE
-    jmp .compared
-.compared:
     ret
 
 
