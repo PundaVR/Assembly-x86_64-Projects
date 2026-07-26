@@ -83,8 +83,8 @@ GameLoop:
 DidPlacementWinGame:
     ; RDI x pos
     ; RSI y pos
-    ; RDX 0=left 1=right 2=middle (will work from 0 to 2)
-    ;     so passing 0 will do all three, passing 2 will only do middle
+    ; RDX 0=left 1=middle 2=right (will work from 0 to 2)
+    ;     so passing 0 will do all three, passing 2 will only do right
     
     ; rbp-64 holds GetTile: x
     ; rbp-4 holds last player turn
@@ -102,16 +102,17 @@ DidPlacementWinGame:
     mov r13, r15 ; r13 holds Y (we iterate through) 
 
 .StartCheckLoop:
+    
     cmp byte [rbp-7], 3 ; 3 = is dont do any checks, 4 = idk
     je .EndWinningChecks
     cmp byte [rbp-7], 1
     jl .CheckLeft
-    je .CheckRight
-    jg .CheckMiddle 
+    je .CheckMiddle 
+    jg .CheckRight
 
 .IncrementCheckSide:
-    inc byte [rbp-7]
-    mov [rbp-9], byte 0
+    inc byte [rbp-7] ; check side
+    mov [rbp-9], byte 0 ; reset tile counter to 0
     jmp .StartCheckLoop
 
 .CheckLeft:
@@ -121,28 +122,36 @@ DidPlacementWinGame:
 
     mov rdi, 'CHECK L'
     call PrintLn 
+
+    mov rdi, r12 ; xPos in rdi
+    mov rsi, r13 ; yPos in rsi
+    mov rdx, 'K'
+    call SetTile ; get tile at pos
+
+
     dec r12  ; Check -x first
     jmp .LookForMatchingTile
 
 .CheckMiddle:
     cmp byte [rbp-9], 1 ;Check if tile counter > 2 (0,1,2)
-    jg .EndWinningChecks  ; AFTER WE CHECK MIDDLE - WE ARE FINISHED!
+    jg .IncrementCheckSide
     
     inc [rbp-9]
     mov rdi, 'CHECK M'
     call PrintLn 
-    inc r12
+    dec r12 ; right +2 (so we -1 to get back)
     jmp .LookForMatchingTile
 
 .CheckRight:
     cmp byte [rbp-9], 2 ;Check if tile counter > 2 (0,1,2)
-    jg .IncrementCheckSide
+    jg .EndWinningChecks  ; AFTER WE CHECK RIGHT - WE ARE FINISHED!
     inc [rbp-9]
     mov rdi, 'CHECK R'
     call PrintLn 
     ; +X
     ; all Y
     inc r12
+    inc r12  ; increment twice to jump from left to right
 
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
