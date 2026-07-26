@@ -13,6 +13,15 @@
 - rbp-40 = InitBoard number of rows in board
 - rbp 32 = SetTile: Character
 
+rdi 10
+mod [rdi+abs(12)], 
+
+- rbp-14 = x 
+- rbp-13 = y 
+- rbp-12 = diagNeg
+- rbp-11 = diagPos 
+- rbp-10 = store this turn's vector
+
 - rbp-9 = DidPlacementWinGame: Tile Counter (per side) 
       > 0=up 1=sameY 2=down
 - rbp-8 = GetUserInput - amount of chars inputted (2 for x, 3 for xy)

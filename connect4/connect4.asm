@@ -105,6 +105,11 @@ DidPlacementWinGame:
 
 .StartCheckLoop:
     
+    mov [rbp-11], byte 0
+    mov [rbp-12], byte 0
+    mov [rbp-13], byte 0
+    mov [rbp-14], byte 0
+
     cmp byte [rbp-7], 3 ; 3 = is dont do any checks, 4 = idk
     je .EndWinningChecks
 
@@ -251,41 +256,137 @@ DidPlacementWinGame:
     sub r12, r14;sub r14, r12 ; if -1 its left, 1 is right 
     sub r13, r15;sub r15, r13 ; if -1 its above, 1 is below
 
+    mov rdi, 'NEG/POS '
+    call Print
+    lea rdi, [r12+48]
+    call Print
+    lea rdi, [r13+48]
+    call PrintLn
+
     ; add r12, r14
     ; add r13, r15
-    
+
+.CheckFirst:   
     lea rdi, [r12+r14]
     lea rsi, [r13+r15]
-    mov rdx, 'A'
-    call SetTile
-    
+    call GetTile
+
+    mov dil, [rbp-4] ; COMPARE IF TILE IS SAME
+    cmp byte [rax], dil
+    jne .StartCheckLoop
+
+    ; go increment the connection count, and return to next register    
+    call IncrementConnections
+
+.CheckSecond:
     lea rdi, [r12*2+r14]
     lea rsi, [r13*2+r15]
-    mov rdx, 'B'
-    call SetTile
+    call GetTile
 
+.CheckThird:
     lea rdi, [r12+r12*2]
     add rdi, r14
     lea rsi, [r13+r13*2]
     add rsi, r15
-    mov rdx, 'C'
-    call SetTile
-
-    ;cmp r14, 0
+    call GetTile
 
     
     pop r15
     pop r14
 
-
-
     ; IF NOT CONNECT4:    
     jmp .StartCheckLoop
 
 
-.EndWinningChecks:
 
+.EndWinningChecks:
+    mov rdi, 'CHECKWIN'
+    call PrintLn
+
+    mov r9, 1
+.EndWinningLoop:
+    cmp r9, 4
+    jg .FinishWinningChecks
+    
+    movzx r8, byte [rbp-15+r9]
+
+    mov rdi, r8
+    add rdi, 48
+    call PrintLn
+
+    
+
+    cmp r8, 4
+    jge .WonTheGame
+
+
+
+    inc r9
+    jmp .EndWinningLoop
+
+.WonTheGame:
+    mov rdi, "FUCK YES"
+    call PrintLn
+.FinishWinningChecks:
     ret
+
+IncrementConnections:
+    push r12
+    push r13
+
+    mov rdi, r12
+    mov rsi, r13
+
+    add rdi, rsi
+    
+    cmp rdi, 0
+    jl .IsLessLol
+.IsPositive:
+    ;othershit
+    jmp .GotVector
+
+.IsLessLol:
+    imul rdi, rdi, -1
+    ;add rdi, 48
+    ;call PrintLn
+
+
+.GotVector:
+    mov [rbp-10], dl ; store vector for this turn
+
+    cmp dl, 1
+    jg .VectorIsTwo
+    jl .VectorIsZero
+
+    ;; do baloney
+    cmp r12, 0 ; check if x is zero
+    je .VectorIsAlongX
+
+
+.VectorIsAlongY:
+    inc [rbp-13]
+    jmp .FinishIncrementing 
+
+.VectorIsAlongX:
+    inc [rbp-14]
+    jmp .FinishIncrementing
+
+.VectorIsTwo: ; POSITIVE DIAG
+    inc [rbp-11]
+    jmp .FinishIncrementing
+
+.VectorIsZero: ; NEGATIVE DIAG
+    inc [rbp-12]
+    jmp .FinishIncrementing
+
+.FinishIncrementing:
+    
+
+    pop r13
+    pop r12
+    ret
+
+
 
 ApplyGravityToTile:
     ; modify y until tile found (or reached end)
