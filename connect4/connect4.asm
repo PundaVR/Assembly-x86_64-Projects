@@ -19,7 +19,7 @@ section .data
 
     newLineChar db 0xA ; newline char
 
-    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
+    arrBoard times 5 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
 
 section .text
@@ -243,36 +243,37 @@ ParseUserInput:
 
     ; STORE IN MEMORY EACH BYTE (from RAX)
     mov byte [rbp-3], al ; xPos
+
+    cmp byte [rbp-8], 2
+    je .OnlyParseFirstInput
+
+    ; ELSE: also parse y input
     mov byte [rbp-2], ah ; yPos
+    jmp .ConvertAsciiToNumber
+.OnlyParseFirstInput:
+    mov byte [rbp-2], '0' ; set yPos same as xPos
+    jmp .ConvertAsciiToNumber
     ;inc rax
     ;mov r9b, byte [rax]
     
     
-    ;  mov rdi, ''
-    ;  call PrintLn
-    ;  ; PRINT OUT POSITIONS
-    ;  mov rdi, 'X POS: '
-    ;  call Print
-    ;  movzx rdi, byte [rbp-3]
-    ;  call PrintLn
-  
-    ;  mov rdi, 'Y POS: '
-    ;  call Print
-    ;  movzx rdi, byte [rbp-2]
-    ;  call PrintLn
-
+.ConvertAsciiToNumber:
+;     mov rdi, ''
+;     call PrintLn
+;     ; PRINT OUT POSITIONS
+;     mov rdi, 'X POS: '
+;     call Print
+;     movzx rdi, byte [rbp-3]
+;     call PrintLn
+;  
+;     mov rdi, 'Y POS: '
+;     call Print
+;     movzx rdi, byte [rbp-2]
+;     call PrintLn
 
     ; CONVERT ASCII TO NUMBER
-    cmp byte [rbp-8], 2
-    je .OnlyParseX 
     mov r10, -4 ; we always know its gonna be 2 characters!
     mov r14, -2 ; loop end condition
-    jmp .AsciiStartLoop
-
-.OnlyParseX:
-    mov r10, -4
-    mov r14, -3
-
 .AsciiStartLoop:
     inc r10 ; -3 then -2 (then loop finish) - r10 is rbp pointer
     mov r8b, [rbp+r10] ; r8b holds ASCII value
