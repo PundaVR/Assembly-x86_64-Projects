@@ -19,7 +19,7 @@ section .data
 
     newLineChar db 0xA ; newline char
 
-    arrBoard times 5 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
 
 section .text
@@ -99,12 +99,27 @@ DidPlacementWinGame:
     movzx r15, byte [rbp-56] ; original user yPos
 
     mov r12, r14 ; r12 holds X (we iterate through)
+    dec r12 ; move left a tile
+    
     mov r13, r15 ; r13 holds Y (we iterate through) 
 
 .StartCheckLoop:
     
     cmp byte [rbp-7], 3 ; 3 = is dont do any checks, 4 = idk
     je .EndWinningChecks
+
+    ;;; X pos is done inside the subroutines
+    mov r12, r14
+    dec r12
+    movzx rdi, byte [rbp-7]
+    add r12, rdi
+
+    ;;; SET Y POS FOR NEXT CHECK
+    mov r13, r15     ; reset r13 to be original yPos
+    dec r13          ; -1 (because we plus 0 1 or 2 later)
+    movzx rdi, byte [rbp-9]
+    add r13, rdi ; plus 0 1 or 2 (0 being above original, 1 being inline, 2 being below)
+
     cmp byte [rbp-7], 1
     jl .CheckLeft
     je .CheckMiddle 
@@ -122,14 +137,13 @@ DidPlacementWinGame:
 
     mov rdi, 'CHECK L'
     call PrintLn 
-
+    
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
-    mov rdx, 'K'
+    mov rdx, 'L'
     call SetTile ; get tile at pos
 
 
-    dec r12  ; Check -x first
     jmp .LookForMatchingTile
 
 .CheckMiddle:
@@ -140,6 +154,12 @@ DidPlacementWinGame:
     mov rdi, 'CHECK M'
     call PrintLn 
     dec r12 ; right +2 (so we -1 to get back)
+
+    
+    mov rdi, r12 ; xPos in rdi
+    mov rsi, r13 ; yPos in rsi
+    mov rdx, 'M'
+    ;call SetTile ; get tile at pos
     jmp .LookForMatchingTile
 
 .CheckRight:
@@ -160,6 +180,10 @@ DidPlacementWinGame:
     cmp byte [rax], dil ; check if neigbour tile is same
     je .FollowTile ; TRUE - tile is same, check following tiles
     
+    mov rdi, r12 ; xPos in rdi
+    mov rsi, r13 ; yPos in rsi
+    mov rdx, 'R'
+    ;call SetTile ; get tile at pos
     jmp .LookForMatchingTile
 
 .FollowTile:
