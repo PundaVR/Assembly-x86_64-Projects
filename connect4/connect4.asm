@@ -348,7 +348,7 @@ DidPlacementWinGame:
 
     
 
-    cmp r8, 4
+    cmp r8, 3
     jge .WonTheGame
 
     
