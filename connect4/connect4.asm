@@ -140,6 +140,16 @@ StartCheckLoops:
     mov rdx, 'W'
     call SetTile
 
+    sub r14, r12
+
+
+    mov rdi, r12
+    add rdi, 48
+    call Print
+    mov rdi, r14
+    add rdi, 48
+    call PrintLn
+
     jmp .CheckLeft
 
 
@@ -444,16 +454,26 @@ SetTile:
     ; mov rdx, 'O'
     ; call SetTile
 
+
     mov [rbp-32], rdx ; store RDX in stack
     call GetTile ; get the tile (this overwrites rdi/rsi/rdx/etc)
-    mov r15b, [rbp-32] ; get the 8 bytes from rbp
-    mov [rax], r15b ; write the character to the tile position
+    movzx rdi, byte [rbp-32] ; get the 8 bytes from rbp
+    mov [rax], byte dil ; write the character to the tile position
+    
+    
     ret
+
 
 GetTile:
     ; (xPos) Index of tile, will be 0,1,2,3,etc - RDI 
     ; (yPos) Row - RSI
     ; RETURN: pointer to correct tile (char in string)
+    
+    push r12
+    push r13
+    push r14
+    push r15
+   
     mov [rbp-64], rdi ; store arg1 in memory (index)
     mov [rbp-56], rsi;
 
@@ -485,6 +505,13 @@ GetTile:
 
     add rcx, r14
     mov rax, rcx ; RETURN POINTER TO THE CORRECT TILE
+
+
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+
     ret
 
 
