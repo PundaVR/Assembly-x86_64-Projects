@@ -141,8 +141,7 @@ DidPlacementWinGame:
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
     mov rdx, 'L'
-    call SetTile ; get tile at pos
-
+    ;call SetTile ; get tile at pos
 
     jmp .LookForMatchingTile
 
@@ -163,8 +162,7 @@ DidPlacementWinGame:
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
     mov rdx, 'M'
-    call SetTile ; get tile at pos
-
+    ;call SetTile ; get tile at pos
 
     jmp .LookForMatchingTile
 
@@ -179,22 +177,9 @@ DidPlacementWinGame:
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
     mov rdx, 'R'
-    call SetTile ; get tile at pos
-
+    ;call SetTile ; get tile at pos
 
     jmp .LookForMatchingTile
-
-.FollowTile:
-    mov rdi, r14
-    mov rsi, r15
-
-    sub rdi, r12
-    sub rsi, r13
-
-    mov rdi, 1
-    jmp .StartCheckLoop
-    
-
 
 .LookForMatchingTile:
     mov rdi, r12
@@ -219,8 +204,9 @@ DidPlacementWinGame:
     mov rdx, 'W'
     call SetTile
 
+    ;;;;;;;;;;;;;;; i dunno bro!
+    push r14
     sub r14, r12
-
     ; prints '41' for example (r12 r14)
     mov rdi, r12
     add rdi, 48
@@ -228,6 +214,11 @@ DidPlacementWinGame:
     mov rdi, r14
     add rdi, 48
     call PrintLn
+    pop r14
+    ;;;;;;;;;;;;;
+
+
+    jmp .StartCheckLoop
 
     ; check our direction ,and jmp accordingly
     cmp r14b, 0 
