@@ -149,17 +149,23 @@ DidPlacementWinGame:
 .CheckMiddle:
     cmp byte [rbp-9], 1 ;Check if tile counter > 2 (0,1,2)
     jg .IncrementCheckSide
-    
     inc [rbp-9]
+
+    cmp byte [rbp-9], 1
+    jle .SkipMiddle 
+    inc r13
+
+.SkipMiddle:
+
     mov rdi, 'CHECK M'
     call PrintLn 
-    dec r12 ; right +2 (so we -1 to get back)
-
     
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
     mov rdx, 'M'
-    ;call SetTile ; get tile at pos
+    call SetTile ; get tile at pos
+
+
     jmp .LookForMatchingTile
 
 .CheckRight:
