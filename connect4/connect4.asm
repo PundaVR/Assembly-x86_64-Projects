@@ -202,7 +202,7 @@ DidPlacementWinGame:
     mov rdi, r12
     mov rsi, r13
     mov rdx, 'W'
-    call SetTile
+    ;call SetTile
 
     ;;;;;;;;;;;;;;; i dunno bro!
     push r14
@@ -217,16 +217,71 @@ DidPlacementWinGame:
     pop r14
     ;;;;;;;;;;;;;
 
+    ; GET DIRECTION OF TILE FROM ORIGIN
+    ; CHECK NEXT 2
 
+    movzx rdi, byte [rbp-7] ; CHECK SIDE (x)
+    movzx rsi, byte [rbp-9] ; TILE COUNT (y)
+    
+    ;cmp r12, 
+
+    push r14
+    push r15
+    
+    mov rdi, 'WOAH AAA'
+    call PrintLn
+    
+    lea rdi, [rdi+r12+48] ; its math bro
+    ;mov rdi, r12
+    ;add rdi, 48
+    call Print
+    mov rdi, r14
+    add rdi, 48
+    call PrintLn
+
+    mov rdi, r13
+    add rdi, 48
+    call Print
+    mov rdi, r15
+    add rdi, 48
+    call PrintLn
+
+    ; r14/15 holds original position
+    ; r12/13 hold nearby tile we're now checking
+    sub r12, r14;sub r14, r12 ; if -1 its left, 1 is right 
+    sub r13, r15;sub r15, r13 ; if -1 its above, 1 is below
+
+    ; add r12, r14
+    ; add r13, r15
+    
+    lea rdi, [r12+r14]
+    lea rsi, [r13+r15]
+    mov rdx, 'A'
+    call SetTile
+    
+    lea rdi, [r12*2+r14]
+    lea rsi, [r13*2+r15]
+    mov rdx, 'B'
+    call SetTile
+
+    lea rdi, [r12+r12*2]
+    add rdi, r14
+    lea rsi, [r13+r13*2]
+    add rsi, r15
+    mov rdx, 'C'
+    call SetTile
+
+    ;cmp r14, 0
+
+    
+    pop r15
+    pop r14
+
+
+
+    ; IF NOT CONNECT4:    
     jmp .StartCheckLoop
 
-    ; check our direction ,and jmp accordingly
-    cmp r14b, 0 
-    jg .StartCheckLoop
-    
-    mov rdi, 'idk bro'
-    call PrintLn
-    jmp .LookForMatchingTile
 
 .EndWinningChecks:
 
