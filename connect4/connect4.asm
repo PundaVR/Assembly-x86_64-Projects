@@ -170,26 +170,18 @@ DidPlacementWinGame:
 
 .CheckRight:
     cmp byte [rbp-9], 2 ;Check if tile counter > 2 (0,1,2)
-    jg .EndWinningChecks  ; AFTER WE CHECK RIGHT - WE ARE FINISHED!
+    jg .EndWinningChecks    
     inc [rbp-9]
+
     mov rdi, 'CHECK R'
     call PrintLn 
-    ; +X
-    ; all Y
-    inc r12
-    inc r12  ; increment twice to jump from left to right
-
-    mov rdi, r12 ; xPos in rdi
-    mov rsi, r13 ; yPos in rsi
-    call GetTile ; get tile at pos
-    mov dil, [rbp-4] ; get current player's turn 
-    cmp byte [rax], dil ; check if neigbour tile is same
-    je .FollowTile ; TRUE - tile is same, check following tiles
     
     mov rdi, r12 ; xPos in rdi
     mov rsi, r13 ; yPos in rsi
     mov rdx, 'R'
-    ;call SetTile ; get tile at pos
+    call SetTile ; get tile at pos
+
+
     jmp .LookForMatchingTile
 
 .FollowTile:
