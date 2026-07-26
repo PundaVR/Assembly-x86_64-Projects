@@ -19,7 +19,7 @@ section .data
 
     newLineChar db 0xA ; newline char
 
-    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
+    arrBoard times 9 db '[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]',10
     len_arrBoard equ $-arrBoard 
 
 section .text
@@ -39,7 +39,7 @@ _start:
 SetupVariables:
     mov [rbp-1], 1 ; game active = true (1)  (only set zero if testing)
     call InitBoard ; MUST CALL THIS ON PROGRAM START
-    
+    mov [rbp-8], 2
     mov [rbp-6], 'X' ;player1
     mov [rbp-5], 'O' ;player2
     mov [rbp-4], 'X' ; make player2 instead of 1, as loop will flip this to 1 
@@ -146,8 +146,10 @@ GetUserInput:
     mov rdi, 1
     syscall 
     
+    movzx r15, byte [rbp-8]
+
     mov rsi, userInput
-    mov rdx, 3
+    lea rdx, byte [rbp-8]
     mov rax, 0
     mov rdi, 0
     syscall
@@ -192,7 +194,16 @@ ParseUserInput:
 
 
     ; CONVERT ASCII TO NUMBER
+    cmp byte [rbp-8], 2
+    je .OnlyParseX 
     mov r10, -4 ; we always know its gonna be 2 characters!
+    mov r14, -2 ; loop end condition
+    jmp .AsciiStartLoop
+
+.OnlyParseX:
+    mov r10, -4
+    mov r14, -3
+
 .AsciiStartLoop:
     inc r10 ; -3 then -2 (then loop finish) - r10 is rbp pointer
     mov r8b, [rbp+r10] ; r8b holds ASCII value
@@ -203,7 +214,7 @@ ParseUserInput:
     ; r10 = 3 (rbp-3)
     ; r10 = 2 (rbp-2)
     ; r10 = 1 (jump out of loop)
-    cmp r10, -2 ; r10
+    cmp r10, r14;-2 ; r10
     jg .AsciiDone
 
     cmp r9b, 9
@@ -438,6 +449,9 @@ CompareTile:
 PrintBoard:
     ;mov rdi, [msgBoardPos]
     ;call PrintLn
+
+    mov rdi, ''
+    call PrintLn
 
     ; rax / rbx
     ; char per row / 3
