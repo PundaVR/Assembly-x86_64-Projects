@@ -1,0 +1,19 @@
+Records of your data files contain the following fields in the following sequence.
+ 
+Field purpose must be an integer in eight bytes 
+Field power must be a floating point number in eight bytes 
+Field cracker must be an unsigned integer in four bytes 
+Field grandfather must be an integer in two bytes 
+Field guitar must be a Boolean in one byte 
+Field appliance must be a Boolean in one byte 
+Field channel must be a Boolean in one byte 
+Field manager must be a Boolean in two bytes 
+Field cent must be a fixed-length string holding at most 11 characters (including terminating nulls) 
+Field drain must be a Boolean in one byte 
+Field spiders must be a character in one byte 
+Field clover must be a floating point number in four bytes 
+Field lamp must be an unsigned integer in one byte 
+Field food must be a floating point number in four bytes 
+Field help must be a floating point number in four bytes 
+Field badge must be a Boolean in two bytes 
+Field flowers must be a character in one byte 

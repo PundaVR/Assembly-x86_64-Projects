@@ -1,0 +1,100 @@
+SUMMARY
+Correct output on supplied test files     0.55  Mark.
+Correct output on hidden test files       0.40  Mark.
+Threshold tests: Must be fully correct
+    in order to earn other marks below      
+  Program compiles correctly                    Threshold boolean.
+  Program executes successfully                 Threshold boolean.
+  Correct struct definition                     Threshold no errors.
+  Use memory allocation (malloc etc.)           Threshold boolean.
+  Exit without error in normal usage            Threshold boolean.
+Program Design:                               
+  Error handling:                             
+    Prints usage info if no parameters    0.05  Boolean.  Requires thresholds.
+    Error message if file does not exist  0.05  Boolean.  Requires thresholds.
+    Exit with error if file not exist     0.05  Boolean.  Requires thresholds.
+  Memory allocation:                          
+    No memory leak                        0.05  Boolean.  Requires thresholds.
+    Adaptive memory allocation            0.05  Boolean.  Requires thresholds.
+  Other:                                      
+    Files are opened and closed           0.05  Boolean.  Requires thresholds.
+Sorting:                                      
+  Uses system sort library                0.15  Boolean.  Requires thresholds.
+  Sort pointers, not whole structs        0.10  Boolean.  Requires thresholds.
+                                         ------
+                                          1.50
+
+NOTES
+Correct output on supplied test files: 0.55 marks.
+An average mark for correctness on the test files provided to the
+student.
+
+Correct output on hidden test files: 0.40 marks.
+An average mark for correctness on the additional test files not
+provided to the student.
+
+Program compiles correctly: threshold.
+The program must compile correctly in order to be awarded other marks
+that require the thresholds.
+
+Program executes successfully: threshold.
+The program must execute to completion on all test cases in order to
+be awarded other marks that require the thresholds.
+
+Correct struct definition: threshold.
+The struct definition must have correct field names and types in order
+to be awarded other marks that require the thresholds.
+
+Use memory allocation (malloc etc.): threshold.
+The program must dynamically allocate memory using malloc in order to
+be awarded other marks that require the thresholds.
+
+Exit without error in normal usage: threshold.
+See "Systems Programming Style".  The program must exit with
+appropriate status in order to be awarded other marks that require the
+thresholds.
+
+Prints usage info if no parameters: 0.05 marks.
+See "Systems Programming Style".  The program should print usage
+information when appropriate, otherwise the mark will be 0.0.  The
+mark will be suppressed (set to zero) if any threshold requirement is
+not met.
+
+Error message if file does not exist: 0.05 marks.
+See "Systems Programming Style".  The program should print an error
+message when appropriate, otherwise the mark will be 0.0.  The mark
+will be suppressed (set to zero) if any threshold requirement is not
+met.
+
+Exit with error if file not exist: 0.05 marks.
+See "Systems Programming Style".  The program should exit with error
+status when appropriate, otherwise the mark will be 0.0.  The mark
+will be suppressed (set to zero) if any threshold requirement is not
+met.
+
+No memory leak: 0.05 marks.
+See "Systems Programming Style".  The program should not have memory
+leaks, otherwise the mark will be 0.0.  The mark will be suppressed
+(set to zero) if any threshold requirement is not met.
+
+Adaptive memory allocation: 0.05 marks.
+The program should adapt its use of memory allocation, using less
+memory for small files, otherwise the mark will be 0.0.  The mark will
+be suppressed (set to zero) if any threshold requirement is not met.
+
+Files are opened and closed: 0.05 marks.
+See "Systems Programming Style".  The program should close every file
+that it opens, otherwise the mark will be 0.0.  The mark will be
+suppressed (set to zero) if any threshold requirement is not met.
+
+Uses system sort library: 0.15 marks.
+The program should use a system library routine (specifically qsort)
+to sort the data, otherwise the mark will be 0.0.  The mark will be
+suppressed (set to zero) if any threshold requirement is not met.
+
+Sort pointers, not whole structs: 0.10 marks.
+This mark is awarded if the program sorts data efficiently by sorting
+an array of pointers, otherwise the mark will be 0.0.  The mark will
+be suppressed (set to zero) if any threshold requirement is not met.
+
+Total mark is out of 1.50.

@@ -1,0 +1,20 @@
+
+Sorting order (in order of precedence):
+ 
+cent in ascending order. 
+lamp in descending order. 
+appliance in ascending order. 
+food in descending order. 
+grandfather in descending order. 
+help in ascending order. 
+drain in ascending order. 
+clover in descending order. 
+spiders in descending order. 
+channel in descending order. 
+cracker in descending order. 
+purpose in ascending order. 
+badge in ascending order. 
+flowers in ascending order. 
+manager in ascending order. 
+power in descending order. 
+guitar in ascending order. 

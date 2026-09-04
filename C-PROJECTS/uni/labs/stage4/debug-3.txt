@@ -1,0 +1,4 @@
+purpose, power, cracker, grandfather, guitar, appliance, channel, manager, cent, drain, spiders, clover, lamp, food, help, badge, flowers
+180685, -2145.953125, 1, ffff, 0, 0, 1, 0, chess, 0, f, -0.292969, 74, 15.681200, -0.000488, 1, T
+116027020, -0.615234, 35, ffff, 0, 1, 0, 1, rate, 1, 8, -57.509277, 60, 0.000064, 44405.414062, 0, U
+395056, -225.601562, 15, ffff, 1, 0, 0, 0, news, 0, s, -0.085449, 1, -0.000045, -3.644531, 0, A

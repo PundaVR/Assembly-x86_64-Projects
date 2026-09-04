@@ -1,0 +1,3 @@
+purpose, power, cracker, grandfather, guitar, appliance, channel, manager, cent, drain, spiders, clover, lamp, food, help, badge, flowers
+94432169122725653, 0.730469, 33120122, ffff, 1, 1, 1, 1, prison, 1, y, -294.951660, 20, 0.003381, -0.005371, 0, >
+1, 15.810547, 56890, 9b, 0, 1, 1, 0, rake, 1, A, -749.555664, 0, -12.868208, 0.000977, 0, L

@@ -1,0 +1,20 @@
+The initial values of the data fields in your record are as follows.
+ 
+
+Field 'purpose' must be decimal value 147 converted to octal notation  
+Field 'power' must be 7188.429688  
+Field 'cracker' must be the hexadecimal conversion of decimal number 2887  
+Field 'grandfather' must be decimal -468  
+Field 'guitar' must be 0  
+Field 'appliance' must be 1  
+Field 'channel' must be 1  
+Field 'manager' must be 0  
+Field 'cent' must be the character string "noise"
+Field 'drain' must be 1  
+Field 'spiders' must be the single character 't'
+Field 'clover' must be 15006.412109  
+Field 'lamp' must be decimal 3  
+Field 'food' must be -0.000317  
+Field 'help' must be -0.084473  
+Field 'badge' must be 1  
+Field 'flowers' must be the single character '='

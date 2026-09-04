@@ -1,0 +1,69 @@
+SUMMARY
+Correct output on supplied test files     0.60  Mark.
+Correct output on hidden test files       0.50  Mark.
+Threshold tests: Must be fully correct
+    in order to earn other marks below      
+  Program compiles correctly                    Threshold boolean.
+  Exit without error in normal usage            Threshold boolean.
+Program Design:                               
+  Correct struct definition               0.10  Less 0.05 per error.  Threshold 2 errors.
+  Error handling:                             
+    Prints usage info if no parameters    0.05  Boolean.  Requires thresholds.
+    Error message if file does not exist  0.10  Boolean.  Requires thresholds.
+    Exit with error if file not exist     0.10  Boolean.  Requires thresholds.
+  Other:                                      
+    Files are opened and closed           0.05  Boolean.  Requires thresholds.
+                                         ------
+                                          1.50
+
+NOTES
+Correct output on supplied test files: 0.60 marks.
+Your program's output is compared with the expected output row-by-row
+and column-by-column.  Errors reduce the score for an individual file.
+The mark is the average score for all the supplied test files.
+
+Correct output on hidden test files: 0.50 marks.
+Your program's output is compared with the expected output row-by-row
+and column-by-column using test files that are not supplied to you.
+Errors reduce the score for an individual file.  The mark is the
+average score for all the hidden test files.
+
+Program compiles correctly: threshold.
+If your program does not compile, this threshold will not be satisfied
+and other marks will not be awarded that require the thresholds.
+
+Exit without error in normal usage: threshold.
+See "Systems Programming Style".  The program must exit with
+appropriate status in order to be awarded other marks that require the
+thresholds.
+
+Correct struct definition: 0.10 marks, threshold.
+The struct definition in your program code is compared with the
+correct definition.  Any incorrect member names, or incorrect types,
+are counted as errors.  The mark is reduced by 0.05 for each error, up
+to a maximum of 2 errors when the mark becomes 0.00.  This marking
+item is a threshold: There must be no more than 2 errors found in this
+item in order to be awarded other marks that require the thresholds.
+
+Prints usage info if no parameters: 0.05 marks.
+See "Systems Programming Style".  If the program does not
+appropriately print usage information, the mark will be 0.0.  The mark
+will be suppressed (set to zero) if any threshold requirement is not
+met.
+
+Error message if file does not exist: 0.10 marks.
+See "Systems Programming Style".  If the program does not print an
+appropriate error message, the mark will be 0.0.  The mark will be
+suppressed (set to zero) if any threshold requirement is not met.
+
+Exit with error if file not exist: 0.10 marks.
+See "Systems Programming Style".  If the program's exit status does
+not correctly indicate an error, the mark will be 0.0.  The mark will
+be suppressed (set to zero) if any threshold requirement is not met.
+
+Files are opened and closed: 0.05 marks.
+See "Systems Programming Style".  If the program does not properly
+close files, the mark will be 0.0.  The mark will be suppressed (set
+to zero) if any threshold requirement is not met.
+
+Total mark is out of 1.50.

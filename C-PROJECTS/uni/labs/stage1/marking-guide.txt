@@ -1,0 +1,37 @@
+SUMMARY
+Correct output                            0.50  Less 0.075 per error.
+Correct struct definition                 0.45  Less 0.075 per error.
+Correct initialisation of struct          0.45  Less 0.075 per error.
+Exit without error in normal usage        0.10  Boolean.
+                                         ------
+                                          1.50
+
+NOTES
+Correct output: 0.50 marks.
+Your program's output is compared value-by-value with the expected
+output.  Any differences in the headings or the values (including
+formatting differences) are errors.  The mark is reduced by 0.075 for
+each error, up to a maximum of 6 errors when the mark becomes 0.00.
+
+Correct struct definition: 0.45 marks.
+The struct definition in your program code is compared with the
+correct definition.  Any incorrect member names, or incorrect types,
+are counted as errors.  The mark is reduced by 0.075 for each error,
+up to a maximum of 6 errors when the mark becomes 0.00.
+
+Correct initialisation of struct: 0.45 marks.
+The initialisation of the struct in your program code is checked
+carefully.  The values must be formatted as specified in your
+initialisation-specification.txt file.  For some initial values, you
+are required to perform a conversion such as decimal to hexadecimal as
+specified.  The mark is reduced by 0.075 for each error, up to a
+maximum of 6 errors when the mark becomes 0.00.
+
+Exit without error in normal usage: 0.10 marks.
+Programs should only exit with an error status if they have
+encountered an error.  This mark is awarded for programs that exit
+correctly.  This is a pass/fail marking item.  Either you are awarded
+the maximum mark of 0.10 for satisfying the item, or you are awarded
+0.00.
+
+Total mark is out of 1.50.
