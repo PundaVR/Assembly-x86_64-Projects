@@ -43,13 +43,13 @@ void PrintFileData(FILE *f)
     printf("\nInput Size: %d\n", inputFileSize);
 }
 
-void ReadData(FILE *f, Record *records)
+void DOGSHIT_ReadData(FILE *f, Record *records)
 {
     rewind(f); // make sure to rewind f incase its been moved
     unsigned char buffer[STRUCT_SIZE];
     size_t sizeOfRead = fread(buffer, sizeof(char), STRUCT_SIZE, f);
 
-    printf("Input File:\n");
+    printf("ReadData():\n");
     for (int i = 0; i < STRUCT_SIZE; i++)
     {
         unsigned char byte = buffer[i]; // < 65 ? '.' : buffer[i];
@@ -61,19 +61,81 @@ void ReadData(FILE *f, Record *records)
         more bullshit
         */
 
-        // set the zero bytes
+        /* set the zero bytes
         if (i == 3 || i == 5 || i == 21 || i == 31)
         {
             unsigned char *byte_ptr = (unsigned char *)records;
 
             // Move to the offset and assign the new value
             *(byte_ptr + i) = 0;
-        }
+        }*/
 
-        printf("%c ", byte < 65 || byte > 122 ? '.' : byte);
+        printf("%d modified: %hx\n", i, &records[i]);
+        fread(&records[i], 1, 8, f);
+        printf("%d modified: %hx\n", i, &records[i]);
+
+
+
+        //printf("%c ", byte < 65 || byte > 122 ? '.' : byte);
     }
 
+    
+    
     printf("\nInput Size: %d\n", 696969);
+}
+
+
+
+void ReadData(FILE *f, Record *records)
+{
+    rewind(f); // make sure to rewind f incase its been moved
+    unsigned char buffer[STRUCT_SIZE];
+    size_t sizeOfRead = fread(buffer, sizeof(char), STRUCT_SIZE, f);
+
+    printf("ReadData():\n");
+
+    // this works
+    rewind(f);
+    printf("%d modified: %hx\n", 0, records->purpose);
+    fread(&records->purpose, 1, 8, f);
+    printf("%d modified: %hx\n", 1, records->purpose);
+
+
+    rewind(f); // this does not work
+    unsigned char *bytePtr = (unsigned char *)records;
+
+    for (int i = 0; i < STRUCT_SIZE; i++) {
+        // Read 1 byte from file into the i-th byte offset of the struct
+        if (i == 3 || i == 5 || i == 21 || i == 31) continue;
+        size_t readCount = fread(bytePtr + i, 1, 1, f);
+        
+        if (readCount == 1) {
+            printf("Byte %2d updated: 0x%02x\n", i, bytePtr[i]);
+        }
+    }
+    
+    
+    printf("\nInput Size: %d\n", 696969);
+}
+
+void PrintRecords(Record *records){
+    printf("\npurpose: %ld", records->purpose);
+    printf("\npower: %f", records->power);
+    printf("\ncracker: %u", records->cracker);
+    printf("\ngrandfather: %d", records->grandfather);
+    printf("\nguitar: %u", records->guitar);
+    printf("\nappliance: %u", records->appliance);
+    printf("\nchannel: %u", records->channel);
+    printf("\nmanager: %hu", records->manager);
+    printf("\ncent: %s", records->cent);
+    printf("\ndrain: %u", records->drain);
+    printf("\nspiders: %c", records->spiders);
+    printf("\nclover: %f", records->clover);
+    printf("\nlamp: %u", records->lamp);
+    printf("\nfood: %f", records->food);
+    printf("\nhelp: %f", records->help);
+    printf("\nbadge: %hu", records->badge);
+    printf("\nflowers: %c", records->flowers);
 }
 
 int main(int argc, char **argv)
@@ -102,11 +164,14 @@ int main(int argc, char **argv)
     }
 
     size_t capacity = STRUCT_SIZE;
-    Record *records = calloc(sizeof(Record), 1);//malloc(sizeof(Record));
+    Record *records = calloc(sizeof(Record), 1);// calloc zeros out memory (better than malloc?) //malloc(sizeof(Record));
 
     PrintFileData(in_fp);
 
     ReadData(in_fp, records);
+
+
+    PrintRecords(records);
 
     // remember to always clean up!
     free(records);
