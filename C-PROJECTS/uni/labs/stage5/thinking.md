@@ -4,6 +4,8 @@ output-1.bin through your stage 2 program
 2. In stage 5, the fields are in a different order within each record and the records are in a different order in the output file because the output file is sorted. 
 These differences make stage 5 considerably more difficult than stage 4.
 
+
+
 # RECORDS
 > Records of your data files contain the following fields in the following sequence.
 Field purpose must be an integer in eight bytes 
@@ -152,3 +154,4 @@ here can see bytes at index 3 and 5 are zero!
 - sizeof(file) divided by 56 (sizeof struct(might be 53)? OR output-1.bin ) 
 -> this contains amount of leading empty or full bytes at start of file
 
+- array is alphabetical ordered by cent
