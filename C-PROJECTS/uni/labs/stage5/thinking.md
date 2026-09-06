@@ -4,6 +4,8 @@ output-1.bin through your stage 2 program
 2. In stage 5, the fields are in a different order within each record and the records are in a different order in the output file because the output file is sorted. 
 These differences make stage 5 considerably more difficult than stage 4.
 
+Compare output using this command in CLI
+diff -s <(xxd -b output-4.bin) <(xxd -b test4.bin)
 
 
 # RECORDS

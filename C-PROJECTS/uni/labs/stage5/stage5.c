@@ -51,9 +51,8 @@ struct Record
     float help;              // 4 bytes
     unsigned short badge;    // 2 bytes
     char flowers;            // 1 byte
-}; 
+};
 #pragma pack(pop)
-
 
 // hideSpecialChar set to 1 to replace shit with '.'
 // returns filesize
@@ -103,10 +102,10 @@ void ReadData(FILE *f, struct Record *records, int index)
     records[index].appliance = (flags & 0x80) ? 1 : 0;
     records[index].channel = (flags & 0x08) ? 1 : 0;
     records[index].manager = (flags & 0x40) ? 1 : 0;
-    
+
     memcpy(records[index].cent, b + 42, CENT_LEN);
     records[index].cent[CENT_LEN - 1] = '\0';
-    
+
     records[index].drain = b[30] & 1;
     records[index].spiders = (char)b[2];
     records[index].clover = (float)clover_f64;
@@ -143,64 +142,128 @@ void WriteRecordsToFile(FILE *f, struct Record *records, int expectedRecords)
     fwrite(records, sizeof(struct Record), expectedRecords, f);
 }
 
-void ReorderRecords(struct Record *records, int expectedRecord){
-    printf("\n========================\nRecorderRecords() Going through %d records\n", expectedRecord);
-    
-    char cents[CENT_LEN * expectedRecord];
+int CompareStrings(const void *a, const void *b)
+{
+    // Cast the generic pointers to actual string pointers (char **)
 
-    for (int i = 0; i < expectedRecord; i++){
-        // print the original order of cent        
+    return strncmp(*(const char **)&a, *(const char **)&b, CENT_LEN);
+}
+
+void ReorderRecords(struct Record *records, int expectedRecord)
+{
+    printf("\n========================\nRecorderRecords() Going through %d records\n", expectedRecord);
+
+    char cents[CENT_LEN * expectedRecord];
+    int order[expectedRecord];
+
+    for (int i = 0; i < expectedRecord; i++)
+    {
+        // print the original order of cent
         printf("\n\n%d Record: %s\n", i, records[i].cent);
-        
-        char word[CENT_LEN];// = records[i].cent;
+
+        char word[CENT_LEN]; // = records[i].cent;
         memcpy(&word, &records[i].cent, CENT_LEN);
-        for (int j = 0; j < CENT_LEN; j++){
-            
+        for (int j = 0; j < CENT_LEN; j++)
+        {
+
             printf("%c", word[j]);
-            
         }
 
-        memcpy(&cents[i*CENT_LEN], &word, CENT_LEN);
+        memcpy(&cents[i * CENT_LEN], &word, CENT_LEN);
     }
-
 
     printf("Confirming 'cents' holds all strings:\n");
-    for (int x = 0; x < expectedRecord; x++){
-        for (int y = 0; y < CENT_LEN; y++){
-            char c = cents[x*CENT_LEN + y];
+    for (int x = 0; x < expectedRecord; x++)
+    {
+        for (int y = 0; y < CENT_LEN; y++)
+        {
+            char c = cents[x * CENT_LEN + y];
             printf("%c", c < 65 ? '.' : c);
+        }
+    }
 
+    // now we need to reorder!
+
+    printf("\nREORDERING STRINGS!!\n");
+
+    for (int a = 0; a < expectedRecord; a++)
+    {
+        int cmp = strncmp(&cents[a * CENT_LEN], &cents[1 * CENT_LEN], CENT_LEN);
+        printf("Compare %d = %d\n", a, cmp);
+
+        qsort(cents, expectedRecord, CENT_LEN, CompareStrings);
+
+    }
+
+    // printing reorderd strings
+    for (int b = 0; b < expectedRecord; b++)
+    {
+        for (int y = 0; y < CENT_LEN; y++)
+        {
+            char c = cents[b * CENT_LEN + y];
+            printf("%c", c < 65 ? '.' : c);
         }
     }
 
 
+    
+    //
+    // now reorder struct lol
+    //
+    printf("Reordering struct!\n");
+    for (int z = 0; z < expectedRecord; z++){
+        // create temp 
+        
+        // find index of struct with matching cent
+        printf("Comparing ordered index %d\n", z);
+        int matchingIndex = -1;
+        for (int m = 0; m < expectedRecord; m++){
 
+            if (strncmp(records[m].cent, &cents[z*CENT_LEN], CENT_LEN) == 0) {
+                // STRING IS EQUAL
+                printf("index %d IS MATCHING\n", m);
+                matchingIndex = m;
+
+            }
+            else printf("index %d not matching\n", m);
+        }
+
+        if (matchingIndex == -1) printf("NO MATCHING INDEX FOUND FOR %d\n", z);
+
+        struct Record temp; // we need to move temp in z (temp will be m)
+        memcpy(&temp, &records[matchingIndex], sizeof(struct Record));
+        memcpy(&records[matchingIndex], &records[z], sizeof(struct Record));
+        memcpy(&records[z], &temp, sizeof(struct Record));
+
+    }
 
 
     // print the reorgansied order
-
+    for (int i = 0; i < expectedRecord; i++) {
+        printf("\n------------\n");
+        PrintRecords(records, i);
     
-    
-    
+    }
     ///////ppp
-    //unsigned char block[expectedRecord*sizeof(struct Record)]; 
-    
+    // unsigned char block[expectedRecord*sizeof(struct Record)];
+
     // struct Record temp;
-    //memcpy(&temp, &block[0], sizeof(struct Record)); 
-    //memcpy(&block[0], &block[1], sizeof(struct Record)); 
-    //memcpy(&block[1], &temp, sizeof(struct Record));
+    // memcpy(&temp, &block[0], sizeof(struct Record));
+    // memcpy(&block[0], &block[1], sizeof(struct Record));
+    // memcpy(&block[1], &temp, sizeof(struct Record));
 }
 
 int main(int argc, char **argv)
 {
     printf("hello\n\n");
 
-    // if (argc != 3) {
-    //     fprintf(stderr, "Usage: %s inputfile.bin outputfile.bin\n", argv[0]);
-    //     exit(EXIT_FAILURE);
-    // }
+     if (argc != 3) {
+         fprintf(stderr, "Usage: %s inputfile.bin outputfile.bin\n", argv[0]);
+         exit(EXIT_FAILURE);
+     }
 
-    FILE *in_fp = fopen("input-2.bin", "rb"); // FILE *in_fp = fopen(argv[1], "rb");
+    //FILE *in_fp = fopen("input-5.bin", "rb"); 
+    FILE *in_fp = fopen(argv[1], "rb");
     if (in_fp == NULL)
     {
         fprintf(stderr, "%s: cannot open input file '%s'\n", argv[0], argv[1]);
@@ -208,7 +271,8 @@ int main(int argc, char **argv)
     }
 
     //// Must open output file in binary write mode ("wb")
-    FILE *out_fp = fopen("test1.bin", "wb"); // FILE *out_fp = fopen(argv[2], "wb");
+    //FILE *out_fp = fopen("test1.bin", "wb"); 
+    FILE *out_fp = fopen(argv[2], "wb");
     if (out_fp == NULL)
     {
         fprintf(stderr, "%s: cannot open output file '%s'\n", argv[0], argv[2]);
@@ -221,15 +285,11 @@ int main(int argc, char **argv)
     printf("INPUT_FILE_STRUCT_SIZE %d\n", INPUT_FILE_STRUCT_SIZE);
     printf("Expected records = %d\n", expectedRecords);
 
-    size_t capacity = expectedRecords*sizeof(struct Record);
-    
-    //Record *records = calloc(sizeof(Record), expectedRecords); // calloc zeros out memory (better than malloc?) //malloc(sizeof(Record));
+    size_t capacity = expectedRecords * sizeof(struct Record);
 
+    // Record *records = calloc(sizeof(Record), expectedRecords); // calloc zeros out memory (better than malloc?) //malloc(sizeof(Record));
 
-
-    struct Record *records = (struct Record *) calloc(sizeof(struct Record), expectedRecords);
-
-
+    struct Record *records = (struct Record *)calloc(sizeof(struct Record), expectedRecords);
 
     for (int i = 0; i < expectedRecords; i++)
     {
