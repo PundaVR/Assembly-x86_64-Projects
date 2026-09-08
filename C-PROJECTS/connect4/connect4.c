@@ -66,14 +66,14 @@ unsigned char GetCell(struct Board board, int x, int y)
     return board.data[index];
 }
 
-int SetCell(struct Board board, int x, int y)
+int SetCell(struct Board board, int x, int y, unsigned char token)
 {
     int index = 1;
     x = x * 3;
     y = y * (board.x * 3) + y;
     index += x + y;
 
-    board.data[index] = 'X';
+    board.data[index] = token;
 }
 
 void PrintBoard(struct Board board)
@@ -119,6 +119,13 @@ int GetUserInputX(struct Board board){
     return xPos;
 }
 
+void WriteFinalBoardToFile(struct Board board) {
+    FILE *f = fopen("output.txt", "wb");
+    if (f == NULL) printf("\nshit\n");
+    fwrite(board.data, board.size, 1, f);
+    fclose(f);
+}
+
 int main(int argc, char **argv)
 {
     int gameActive = 1;
@@ -148,14 +155,24 @@ int main(int argc, char **argv)
     board.y = boardY;
 
     InitBoard(board);
+    unsigned char player1Token = 'X';
+    unsigned char player2Token = 'O';
+
+    int maxTurns = 20; // after 20 turns end game
+    int turnCount = 0;
     while (gameActive){
-    
+        unsigned char token = player2Token == token ? player1Token : player2Token;
         PrintBoard(board);
         int x = GetUserInputX(board);
         int y = GetColumnGravity(board, x);
-        SetCell(board, x, y);    
+        SetCell(board, x, y, token);
+
+        turnCount++;
+        gameActive = turnCount > maxTurns ? 0 : 1;
     }
-    PrintBoard(board);
+    
+    printf("\n\n=====================\nGAME OVER\n=====================\n\n");
+    WriteFinalBoardToFile(board);
 
     free(board.data);
     return 0;
