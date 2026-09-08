@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Board
+{
+    unsigned char *data;
+    size_t size;
+    int x;
+    int y;
+};
+
+int GetBoardMemSize(int x, int y)
+{
+    return (x * y * 3) + (y - 1);
+    /* amount of char = 29
+    [ ][ ][ ]\n 10
+    [ ][ ][ ]\n 10
+    [ ][ ][ ] 9
+    */
+}
+
+char GetCell(struct Board board, int x, int y)
+{
+}
+
+int SetCell(struct Board board, int x, int y)
+{
+    int index = 1;
+    x = x*3;
+    y = y * (board.x*3)+y;
+    index += x + y;
+
+
+    board.data[index] = 'X';
+}
+
+void PrintBoard(struct Board board)
+{
+    printf("\nPRINTING BOARD:\n");
+    int i = 0;
+    for (;;)
+    {
+        printf("%c", board.data[i]);
+        if (board.data[i] == 0)
+            break;
+        i++;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    int boardX = 0;
+    int boardY = 0;
+
+    printf("\nEnter board size along HORIZONTAL (x): ");
+    if (scanf("%d", &boardX) != 1)
+    {
+        printf("Invalid input!\n");
+        return 1;
+    }
+
+    printf("Enter board size along VERTICAL (y): ");
+    if (scanf("%d", &boardY) != 1)
+    {
+        printf("Invalid input!\n");
+        return 1;
+    }
+
+    int boardSize = GetBoardMemSize(boardX, boardY);
+
+    struct Board board;
+    board.data = calloc(boardSize, sizeof(unsigned char)); // [ ][ ][ ]\n
+    board.size = boardSize;
+    board.x = boardX;
+    board.y = boardY;
+
+    printf("print");
+
+    int totalCells = 0;
+    for (unsigned char i = 0; i < boardY; i++)
+    {
+        int counter = 0;
+        for (int x = 0; x <= boardX * 3; x++)
+        {
+            if (counter == 0)
+            {
+                board.data[totalCells] = '[';
+            }
+            else if (counter == 1)
+            {
+                board.data[totalCells] = ' ';
+            }
+            else
+                board.data[totalCells] = ']';
+
+            if (x == (boardX * 3))
+                board.data[totalCells] = '\n';
+
+            printf("%d: %c\n", i, board.data[totalCells]);
+
+            counter++;
+
+            if (counter > 2)
+                counter = 0;
+
+            totalCells++; // -1 i guess since we never write i as its out of bounds?
+        }
+    }
+    printf("\nActual size: %ld\nTotal size: %d\nPredicted size: %d", sizeof(board), totalCells, boardSize);
+
+    PrintBoard(board);
+
+    SetCell(board, 3, 2);
+    PrintBoard(board);
+
+    free(board.data);
+    return 0;
+}
